@@ -62,7 +62,7 @@ fontsize: 12 pt
   + Lecture and Lab 9-12
     - Two-level Linear Models with `lme4`
     - Longitudinal Growth Curve Modeling
-    - Generalized Linear Mixed Models Anxiety on Satisfaction
+    - Generalized Linear Mixed Models
   + Lunch 12:00 PM to 1:15 PM  
   + Lecture and Lab 1:15-3:30
     - Dyadic Data Analysis with `nlme`
