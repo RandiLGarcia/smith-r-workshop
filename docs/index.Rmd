@@ -47,6 +47,7 @@ fontsize: 12 pt
   + Lecture and Lab 9-12
     - ANOVA 
     - Regression and Logistic regression
+    - Preparing APA style manuscripts in RMarkdown with `papaja`
   + Lunch 12:00 PM to 1:15 PM  
   + Lecture and Lab 1:15-3:30
     - Exploratory Factor Analysis (EFA) 
@@ -65,16 +66,19 @@ fontsize: 12 pt
     - Generalized Linear Mixed Models
   + Lunch 12:00 PM to 1:15 PM  
   + Lecture and Lab 1:15-3:30
-    - Dyadic Data Analysis with `nlme`
+    - Dyadic Data Analysis with `nlme` and `dyadr`
     - Dyadic Growth Curve Modeling 
   + Resources for more practice
     - [Week long Dyadic Workshop](https://randilgarcia.github.io/week-dyad-workshop/)
     - [Guide to `lme4` versus `nlme`](http://rpsychologist.com/r-guide-longitudinal-lme-lmer)
+    - [ItoP](https://davidakenny.shinyapps.io/ItoP/)
+    - [dyadr gitHub](https://github.com/RandiLGarcia/dyadr)
+
 
 
 ***
 
-#Cheatsheets and R Tutorials
+#Cheatsheets, R Tutorials, and Books
 
   + [dplyr cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
   + [ggplot2 cheatsheet](https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
@@ -83,11 +87,5 @@ fontsize: 12 pt
   + [ggplot2 book by Hadley Wickham](http://ms.mcmaster.ca/~bolker/misc/ggplot2-book.pdf)
   + [R for Data Science by Garrett Grolemund](http://r4ds.had.co.nz/index.html)
 
-  
-#Links to Dyadic Stuff
 
-  + [ItoP](https://davidakenny.shinyapps.io/ItoP/)
-  + [DtoP](https://davidakenny.shinyapps.io/DtoP/)
-  + [ItoD](https://davidakenny.shinyapps.io/ItoD/)
-  + [dyadr gitHub](https://github.com/RandiLGarcia/dyadr)
-  + [DyadR page Webpage](http://davidakenny.net/DyadR/DyadRweb.htm)
+
