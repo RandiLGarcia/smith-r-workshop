@@ -1,0 +1,91 @@
+```{r}
+a_thing <- 4
+another_thing <- 1
+another_Thing <- 7
+
+both_things <- a_thing + another_thing
+```
+
+Then we created a tiny data set.
+
+```{r}
+a_data_thing <- data.frame(x = 2, y = 8)
+
+a_data_thing$x
+
+#How would we print the variable y? Type your answer below on line 17.
+
+
+```
+
+Write notes for yourself in the white space. Maybe explain to your future self what dollar signs do.
+
+
+**ERASE THIS AND TYPE HERE**
+
+
+Enough playing around, let's load some data!
+
+```{r}
+riggsi <- read.csv(file.choose(), header=TRUE)
+```
+
+Next, you want to look at your data.
+
+```{r}
+head(riggsi)
+
+str(riggsi)
+
+names(riggsi)
+```
+
+There is also documentation about functions.
+
+```{r, eval=FALSE}
+?head
+```
+
+You probably also want descriptive statistics.
+
+```{r}
+summary(riggsi)
+```
+
+We can also select pieces of a data frame. That first number is the row, the second is the column.
+
+```{r}
+riggsi[2, 6]
+
+#You try it! Find a numder you want to pull from the dataset.
+#riggsi[ ?, ?]
+
+```
+
+If it is instead a single variable, you can also select a piece.
+
+```{r}
+riggsi$Sat[2]
+```
+
+
+***
+#Bonus Intro to R
+
+More descriptive stats and frequencies with sample proportions. We'll use the package `mosaic`. You can find more information and a cheat sheet for `mosaic` at [this website](https://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf).
+
+```{r, message=FALSE, warning=FALSE}
+library(mosaic)
+```
+
+```{r}
+favstats(~Sat, data = riggsi)
+
+tally(~Gender, data = riggsi, format = "proportion")
+```
+
+Descriptives split by gender.
+
+```{r}
+favstats(Sat ~ Gender, data = riggsi)
+```

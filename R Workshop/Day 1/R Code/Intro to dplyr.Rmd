@@ -1,0 +1,141 @@
+##Data Manipulation
+
+We'll use the package `dplyr`. First, let's filter cases.
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+We can make a dataset of men only.
+
+```{r}
+menOnly <- filter(riggsi, Gender == -1)
+```
+
+We can save this new data set in our files as a csv.
+
+```{r}
+write.csv(menOnly, "men.csv")
+```
+
+It's in your working directory, which you can find with the following command. It is an empty function.
+
+```{r, eval=FALSE}
+getwd()
+```
+
+How about only the men of drinking age.
+
+```{r}
+legal_drinkers <- menOnly %>% filter(Age > 20)
+```
+
+Note the use of the pipe, `%>%`, above. The two statements below are equivalent.
+
+```{r}
+legal_drinkers <- filter(menOnly, Age > 20)
+
+legal_drinkers <- menOnly %>% filter(Age > 20)
+```
+
+Adding new variables.
+
+```{r}
+menOnly <- menOnly %>%
+  mutate(legal = Age > 20)
+
+favstats(Age ~ legal, data = menOnly)
+```
+
+Alternative method for descriptive statistic---the `dplyr` way.
+
+```{r}
+riggsi %>%
+  summarize(mean = mean(Sat),
+            sd = sd(Sat),
+            min = min(Sat))
+```
+
+We can split the file and view results grouped by some variable.
+
+```{r}
+riggsi %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(Sat),
+            sd = sd(Sat),
+            min = min(Sat))
+```
+
+Save a smaller subset of variables.
+
+```{r}
+small <- riggsi %>%
+  select(Dyad, Partner, Sat, Avoid)
+```
+
+You can find a cheat sheet for `dplyr` [here](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+
+##Visualizing Data
+
+Let's make a histogram. We'll use the package `ggplot2` to make our visualizations.
+
+```{r, fig.width = 6, fig.height = 4}
+qplot(x = Sat, data = riggsi, bins = 20)
+```
+
+Scatterplot. `qplot`, which stands for quick plot, guesses which kind of figure you want. 
+
+```{r, fig.width = 6, fig.height = 4}
+qplot(x = Avoid, y = Sat, data = riggsi)
+```
+
+Side-by-side boxplots. In this case it does NOT know what to do, so we tell it we want boxplots. It will also be helpful to have a gender variable that is stored as categorical string variable. We do that first.
+
+```{r, fig.width = 6, fig.height = 4}
+qplot(y = Sat, x = Genderstring, data = riggsi, geom = "boxplot")
+```
+
+We can add a regression line.
+
+```{r, fig.width = 6, fig.height = 4}
+qplot(x = Avoid, y = Sat, data = riggsi) + geom_smooth(method = "lm", se = 0)
+```
+
+We can also split by gender. Note that for more complex models we need to move away from using the `qplot` function in favor of the heavy duty `ggplot` function. 
+
+```{r, fig.width = 6, fig.height = 4}
+ggplot(riggsi, aes(x = Avoid, y = Sat, group = Genderstring, color = Genderstring)) +
+         geom_point() + 
+         geom_smooth(method = "lm", se = 0)
+```
+ 
+You can find a cheat sheet for `ggplot2` here: https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf.  
+ 
+##Statistical Modeling and Inference in R
+
+Independent samples t-test.
+
+```{r}
+t.test(Sat ~ legal, data = menOnly, var.equal = TRUE)
+```
+
+Paired samples t-test.
+
+```{r}
+t.test(Sat, Avoid, data = menOnly, paired = TRUE)
+```
+
+Linear regression.
+
+```{r}
+mod <- lm(Sat ~ Avoid + legal, data = menOnly)
+
+summary(mod)
+```
+
+Regression diagnostics.
+
+```{r, fig.width = 6, fig.height = 4}
+plot(mod)
+```
+
