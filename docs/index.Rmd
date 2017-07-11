@@ -21,7 +21,7 @@ fontsize: 12 pt
 ##Day 1: Introduction to R  
 
   + Lecture and Lab 9-12
-    - Downloading R and RStudio
+    - Downloading [R](https://www.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/)
     - Intro to the RStudio environment, packages, and RMarkdown
     - Loading data with `psych`
     - Data Manipulation with `dplyr` and `tidyr`
