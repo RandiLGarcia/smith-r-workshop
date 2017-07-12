@@ -1,30 +1,71 @@
-##Visualizing Data
-
-Let's make a histogram. We'll use the package `ggplot2` to make our visualizations.
-
-```{r, fig.width = 6, fig.height = 4}
-qplot(x = Sat, data = riggsi, bins = 20)
+---
+title: "Intro to dplyr"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
 ```
 
-Scatterplot. `qplot`, which stands for quick plot, guesses which kind of figure you want. 
+***
 
-```{r, fig.width = 6, fig.height = 4}
-qplot(x = Avoid, y = Sat, data = riggsi)
+```{r}
+acitelli <- read.csv("/Users/randigarcia/Desktop/acitelli.csv", header=TRUE)
 ```
 
-Side-by-side boxplots. In this case it does NOT know what to do, so we tell it we want boxplots. It will also be helpful to have a gender variable that is stored as categorical string variable. We do that first.
+#Visualizing Data
+
+There are quite a few ways to make figures in R, we'll the popular package `ggplot2`. The easiest way to make a figure with `ggplot2` is with the `qplot()` function. This stands for *quick plot*.  
+
+##Quick Histogram
+
+First, let's make a histogram for satisfaction. Notice in the code below that we did not specify histogram, `qplot()` guesses which type of plot we want based on the variable's type. 
 
 ```{r, fig.width = 6, fig.height = 4}
-qplot(y = Sat, x = Genderstring, data = riggsi, geom = "boxplot")
+qplot(satisfaction, data = acitelli)
 ```
 
-We can add a regression line.
+There are too many bins (it defaults to 30 bins), we can ask for a specific number by adding the `bins = ` argument. Try playing around the bin number below to find the optimal plot. I put `30` in there as a placeholder.
+
+```{r}
+qplot(satisfaction, data = acitelli, bins = 30)
+```
+
+##Quick Scatterplot
+
+We might also want a scatterplot. Again,`qplot()` guesses what we want, but it's a good idea to specify which variable goes on the x-axis and which goes on the y-axis. 
 
 ```{r, fig.width = 6, fig.height = 4}
-qplot(x = Avoid, y = Sat, data = riggsi) + geom_smooth(method = "lm", se = 0)
+qplot(x = tension, y = satisfaction, data = acitelli)
 ```
 
-We can also split by gender. Note that for more complex models we need to move away from using the `qplot` function in favor of the heavy duty `ggplot` function. 
+We can even add a third variable, mapping it to color. To get the behavior we want, gender has to be a categorical variable, to do this we can use the `as.factor()` function.
+
+```{r, fig.width = 6, fig.height = 4}
+qplot(x = tension, y = satisfaction, color = as.factor(gender), data = acitelli)
+```
+
+##Quick Boxplots
+
+We can ask for side-by-side boxplots when our x variable is categorical. In this case `qplot()` does **NOT** know what to do, so we tell it we want boxplots with `geom = "boxplot"`. 
+
+```{r, fig.width = 6, fig.height = 4}
+qplot(y = satisfaction, x = wise_hus, data = menOnly, geom = "boxplot")
+```
+
+##`ggplot()`
+
+For more complex figures we will need to move away from using the `qplot` function in favor of the heavy duty `ggplot` function. 
 
 ```{r, fig.width = 6, fig.height = 4}
 ggplot(riggsi, aes(x = Avoid, y = Sat, group = Genderstring, color = Genderstring)) +
