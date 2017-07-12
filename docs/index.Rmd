@@ -22,9 +22,8 @@ fontsize: 12 pt
 
   + Lecture and Lab 9-12
     - Downloading [R](https://www.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/)
-    - Intro to the RStudio environment, packages, and RMarkdown
-    - Loading data with `psych`
-    - Data Manipulation with `dplyr` and `tidyr`
+    - [Intro to the RStudio environment, packages, and RMarkdown](Intro_to_R.html)
+    - [Data Manipulation with `dplyr`](Intro_to_dplyr.html)
     - Descriptive Statistics
   + Lunch 12:00 PM to 1:15 PM 
   + Lecture and Lab 1:15-3:30
@@ -33,12 +32,11 @@ fontsize: 12 pt
     - Reliability Test
     - Independent and Paired Samples t-Tests
   + Resources for more practice
-    - [`ggplot` lab](https://beanumber.github.io/sds192/lab-ggplot2.html)
-    - [`ggplot` colors lab](https://beanumber.github.io/sds192/lab-colorbrewer-ggthemes.html)
     - [`dplyr` lab](https://beanumber.github.io/sds192/lab-single_table.html)
     - [`dplyr` lab 2](https://beanumber.github.io/sds192/lab-group_by.html)
     - [`dplyr` lab 3](https://beanumber.github.io/sds192/lab-join.html)
-    - [`tidyr` lab 4](https://beanumber.github.io/sds192/lab-tidy.html)
+    - [`ggplot` lab](https://beanumber.github.io/sds192/lab-ggplot2.html)
+    - [`ggplot` colors lab](https://beanumber.github.io/sds192/lab-colorbrewer-ggthemes.html)
 
 ***
 
@@ -62,6 +60,7 @@ fontsize: 12 pt
 
   + Lecture and Lab 9-12
     - Two-level Linear Models with `lme4`
+    - Data Manipulation with `tidyr`
     - Longitudinal Growth Curve Modeling
     - Generalized Linear Mixed Models
   + Lunch 12:00 PM to 1:15 PM  
@@ -69,6 +68,7 @@ fontsize: 12 pt
     - Dyadic Data Analysis with `nlme` and `dyadr`
     - Dyadic Growth Curve Modeling 
   + Resources for more practice
+    - [`tidyr` lab 4](https://beanumber.github.io/sds192/lab-tidy.html)
     - [Week long Dyadic Workshop](https://randilgarcia.github.io/week-dyad-workshop/)
     - [Guide to `lme4` versus `nlme`](http://rpsychologist.com/r-guide-longitudinal-lme-lmer)
     - [ItoP](https://davidakenny.shinyapps.io/ItoP/)

@@ -1,3 +1,27 @@
+---
+title: "Intro to R"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+  word_document:
+    toc: yes
+    toc_depth: '3'
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
+```
+
+#Introduction to R
+
 ```{r}
 a_thing <- 4
 another_thing <- 1
@@ -12,32 +36,34 @@ Then we created a tiny data set.
 a_data_thing <- data.frame(x = 2, y = 8)
 
 a_data_thing$x
+```
 
-#How would we print the variable y? Type your answer below on line 17.
+How would we print the variable y? Type your answer in the chunk below
 
+```{r}
 
 ```
 
 Write notes for yourself in the white space. Maybe explain to your future self what dollar signs do.
 
 
-**ERASE THIS AND TYPE HERE**
+**ERASE THIS AND TYPE SOME NOTES HERE**
 
 
 Enough playing around, let's load some data!
 
 ```{r}
-riggsi <- read.csv(file.choose(), header=TRUE)
+acitelli <- read.csv(file.chose(), header=TRUE)
 ```
 
 Next, you want to look at your data.
 
 ```{r}
-head(riggsi)
+head(acitelli)
 
-str(riggsi)
+str(acitelli)
 
-names(riggsi)
+names(acitelli)
 ```
 
 There is also documentation about functions.
@@ -49,13 +75,13 @@ There is also documentation about functions.
 You probably also want descriptive statistics.
 
 ```{r}
-summary(riggsi)
+summary(acitelli)
 ```
 
 We can also select pieces of a data frame. That first number is the row, the second is the column.
 
 ```{r}
-riggsi[2, 6]
+acitelli[2, 6]
 
 #You try it! Find a numder you want to pull from the dataset.
 #riggsi[ ?, ?]
@@ -65,27 +91,68 @@ riggsi[2, 6]
 If it is instead a single variable, you can also select a piece.
 
 ```{r}
-riggsi$Sat[2]
+acitelli$satisfaction[2]
 ```
 
+In the chunk below, pick out the gender of the person in the 50th case.
 
-***
-#Bonus Intro to R
+```{r}
+#try it by referring to the row and column of the data frame.
 
-More descriptive stats and frequencies with sample proportions. We'll use the package `mosaic`. You can find more information and a cheat sheet for `mosaic` at [this website](https://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf).
+#try it by referring to the variable, using the dollar sign notation.
+
+```
+
+#Installing Packages 
+
+You might want to get descriptive stats or frequencies for specific variables. There are `base R` functions, but I like to use the package `mosaic`. You can find more information and a cheat sheet for `mosaic` at [this website](https://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf).
+
+First we need to install the `mosaic` package using the `install.packages()` function. The package name goes inside of the paratheses in double quotes: '"mosaic"'.  This is something we do only once in the console, you wouldn't want to save it in your .Rmd file.
+
+```{r}
+#install.packages("mosaic")
+```
+
+Once a package is installed, any time we start a new R session and we want to use functions inside of that package, we will need to load the package with the `library()` function. 
 
 ```{r, message=FALSE, warning=FALSE}
 library(mosaic)
 ```
 
-```{r}
-favstats(~Sat, data = riggsi)
+#Basic Descriptive Statistics with `mosaic`
 
-tally(~Gender, data = riggsi, format = "proportion")
+The function `favstats()` will give descriptive statistics for a numerical vairable, and the function `tally()` will give you frequencies for a categorical variable (or a numberical variable...if you want it). Functions in `mosaic` use the formula syntax, where `y ~ x`, or for a single variable, `~x`. The `~` key can be found just below your `esc` key. The first argument is the formula, and the second argument is the data frame, e.g., `data = acitelli`.
+
+```{r}
+favstats(~satisfaction, data = acitelli)
+
+tally(~gender, data = acitelli)
+
+#tally() can also give you percentages
+tally(~gender, data = acitelli, format = "percent")
 ```
 
 Descriptives split by gender.
 
 ```{r}
-favstats(Sat ~ Gender, data = riggsi)
+favstats(satisfaction ~ gender, data = acitelli)
 ```
+
+What are the standard deviations of perceived `tension` by gender?
+
+```{r}
+
+```
+
+What is(are) the mode(s) of the `self_pos` variable?
+
+```{r}
+
+```
+
+The `mosaic` package also has a function for getting the correlation coefficent, it's called `cor()`. Using the same format (i.e., formula then data), how would you get the correlation of satisfaction and tension?
+
+```{r}
+
+```
+

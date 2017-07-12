@@ -1,141 +1,240 @@
-##Data Manipulation
+---
+title: "Intro to dplyr"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
+```
 
-We'll use the package `dplyr`. First, let's filter cases.
+***
+
+```{r}
+acitelli <- read.csv("/Users/randigarcia/Desktop/acitelli.csv", header=TRUE)
+```
+
+#Data Manipulation (data cleaning)
+
+We'll use the package `dplyr`. The `dplyr` package contains the functions for all of the data cleaning varbs: `filter()`, `mutate()`, `rename()`, `arrange()`, `select()`, `summarize()`, and `group_by()`. You can find a cheat sheet for `dplyr` [here](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf).
 
 ```{r, message=FALSE, warning=FALSE}
+#install.packages("dplyr")
 library(dplyr)
 ```
 
-We can make a dataset of men only.
+##Filtering cases with filter()
+
+First, let's filter cases. We can make a dataset of men only. Notice that we used a double equal sign, `==`, instead of single, `=`. When you want to ask if something is equal to some value or another variable, that is, you want to use equal in a *logical statement*, you need the double equal. You can also use `>` `<` `>=` `<=` `&`, which means **AND**, and finally, `|` which means **OR**.
 
 ```{r}
-menOnly <- filter(riggsi, Gender == -1)
+menOnly <- filter(acitelli, gender == 1)
 ```
 
-We can save this new data set in our files as a csv.
+We could also use the pipe, `%>%`. 
 
 ```{r}
-write.csv(menOnly, "men.csv")
+menOnly <- acitelli %>%
+  filter(gender ==1)
 ```
 
-It's in your working directory, which you can find with the following command. It is an empty function.
+We can save this new data set in our files as a csv. Note that the file path conventions are differnt for Windows machines. If copying and pasting from properties, you will need to change backslashes to forward slashes. 
+
+```{r}
+write.csv(menOnly, 
+  file = "/Users/randigarcia/Desktop/Three-day-workshop/R Workshop/Data/men.csv")
+```
+
+It's in your working directory, which you can find with the following command. It is an empty function, so it looks weird.
 
 ```{r, eval=FALSE}
 getwd()
 ```
 
-How about only the men of drinking age.
+How about only the men who are above the median for `Yearsmar`. First, find the median years married.
 
 ```{r}
-legal_drinkers <- menOnly %>% filter(Age > 20)
+#use a function in the mosaic package
 ```
 
-Note the use of the pipe, `%>%`, above. The two statements below are equivalent.
+Then, filter for men above that cut off point.
 
 ```{r}
-legal_drinkers <- filter(menOnly, Age > 20)
-
-legal_drinkers <- menOnly %>% filter(Age > 20)
+mature_hus <- menOnly %>% 
+  filter(Yearsmar > -1.089)
 ```
 
-Adding new variables.
+Instead of first finding the median with `favstats()`, we could ask for the median inside of `filter()` with the Base R function, `median()`. Base R has all of the descriptive stats functions you'd expect, `mean()`, `sd()`, `cor()`, but be careful because if you have missing data you'll have to add `rm.na = TRUE` as an argument to the function. The syntax also differs from `mosaic`.
+
+```{r}
+mature_hus <- menOnly %>% 
+  filter(Yearsmar > median(Yearsmar))
+```
+
+##Adding new variables with `mutate()` 
+
+Let's add a new categorical variable that marks the median split on Yearsmar. After you create it, take a look at it.
 
 ```{r}
 menOnly <- menOnly %>%
-  mutate(legal = Age > 20)
-
-favstats(Age ~ legal, data = menOnly)
+  mutate(mature_hus = Yearsmar > median(Yearsmar))
 ```
 
-Alternative method for descriptive statistic---the `dplyr` way.
+How would you get the frequncies on this vairable?
 
 ```{r}
-riggsi %>%
-  summarize(mean = mean(Sat),
-            sd = sd(Sat),
-            min = min(Sat))
+
 ```
 
-We can split the file and view results grouped by some variable.
+Now for a sanity check, how would you get the descriptive stats split by mature and non-mature husbands?
 
 ```{r}
-riggsi %>%
-  group_by(Gender) %>%
-  summarize(mean = mean(Sat),
-            sd = sd(Sat),
-            min = min(Sat))
+
 ```
+
+##Renaming variable with `rename()`
+
+We copy a variable and give it a new name with a function you already know, `mutate()`.
+
+```{r}
+menOnly <- menOnly %>%
+  mutate(old_hus = mature_hus)
+```
+
+We can rename a variable without creating a new one with `rename()`. This is handy if you forget to name variables in Qualtrics!
+
+```{r}
+menOnly <- menOnly %>%
+  rename(wise_hus = old_hus)
+```
+
+We can rename a bunch at the same time. This is handy if you forget to name variables in Qualtrics!
+
+```{r}
+menOnly <- menOnly %>%
+  rename(self_positivity = self_pos,
+         other_positivity = other_pos)
+```
+
+
+##Sorting with `arrange()`
+
+First, you should know that you can sort in the viewer by clicking the (faint) arrows just to the right of each variable name. Give it a try. It's often handy to have a sort command in your code, and/or you might want to sort by more than one variable. 
+
+```{r}
+head(acitelli)
+```
+
+Say we want to take a peak at the women with the bottom 6 `self_pos` scores. 
+
+```{r}
+acitelli %>%
+  arrange(gender, self_pos) %>%
+  head()
+```
+
+We could also save the arranged dataset.
+
+```{r}
+acitelli <- acitelli %>%
+  arrange(gender, self_pos)
+
+head(acitelli)
+```
+
+What about the top 6? We can use the `desc()` function inside of `arrange()`.
+
+```{r}
+acitelli %>%
+  arrange(gender, desc(self_pos)) %>%
+  head()
+```
+
+
+##Selecting variables with `select()`
 
 Save a smaller subset of variables.
 
 ```{r}
-small <- riggsi %>%
-  select(Dyad, Partner, Sat, Avoid)
+small <- acitelli %>%
+  select(cuplid, gender, satisfaction, self_pos)
 ```
 
-You can find a cheat sheet for `dplyr` [here](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
-
-##Visualizing Data
-
-Let's make a histogram. We'll use the package `ggplot2` to make our visualizations.
-
-```{r, fig.width = 6, fig.height = 4}
-qplot(x = Sat, data = riggsi, bins = 20)
-```
-
-Scatterplot. `qplot`, which stands for quick plot, guesses which kind of figure you want. 
-
-```{r, fig.width = 6, fig.height = 4}
-qplot(x = Avoid, y = Sat, data = riggsi)
-```
-
-Side-by-side boxplots. In this case it does NOT know what to do, so we tell it we want boxplots. It will also be helpful to have a gender variable that is stored as categorical string variable. We do that first.
-
-```{r, fig.width = 6, fig.height = 4}
-qplot(y = Sat, x = Genderstring, data = riggsi, geom = "boxplot")
-```
-
-We can add a regression line.
-
-```{r, fig.width = 6, fig.height = 4}
-qplot(x = Avoid, y = Sat, data = riggsi) + geom_smooth(method = "lm", se = 0)
-```
-
-We can also split by gender. Note that for more complex models we need to move away from using the `qplot` function in favor of the heavy duty `ggplot` function. 
-
-```{r, fig.width = 6, fig.height = 4}
-ggplot(riggsi, aes(x = Avoid, y = Sat, group = Genderstring, color = Genderstring)) +
-         geom_point() + 
-         geom_smooth(method = "lm", se = 0)
-```
- 
-You can find a cheat sheet for `ggplot2` here: https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf.  
- 
-##Statistical Modeling and Inference in R
-
-Independent samples t-test.
+We can also save everything but some variable(s).
 
 ```{r}
-t.test(Sat ~ legal, data = menOnly, var.equal = TRUE)
+no_tension <- acitelli %>%
+  select(-tension)
 ```
 
-Paired samples t-test.
+
+##Descriptive statistics with `summarize()`
 
 ```{r}
-t.test(Sat, Avoid, data = menOnly, paired = TRUE)
+acitelli %>%
+  summarize(mean = mean(satisfaction),
+            sd = sd(satisfaction),
+            min = min(satisfaction))
 ```
 
-Linear regression.
+##Grouped descriptives with `group_by()`
+
+We can split the file and view results grouped by some variable.
 
 ```{r}
-mod <- lm(Sat ~ Avoid + legal, data = menOnly)
-
-summary(mod)
+acitelli %>%
+  group_by(gender) %>%
+  summarize(mean = mean(satisfaction),
+            sd = sd(satisfaction),
+            min = min(satisfaction))
 ```
 
-Regression diagnostics.
+You can use `group_by()` to create aggregated variables, this is handy if you have nested data. We actually do have married couples here, so let's create a dyad mean tension variable. 
 
-```{r, fig.width = 6, fig.height = 4}
-plot(mod)
+```{r}
+acitelli <- acitelli %>%
+  group_by(cuplid) %>%
+  mutate(tension_mean = mean(tension)) %>%
+  ungroup()
+
+#this last command is not entirely nessesary, but good practice
 ```
+
+
+###Pipelines
+
+We now seen our first piplines, using `group_by()`. Now we can make a pipeline of many of the commands I did above. The last thing I do is drop useless `gender` variable, because the resulting dataset if all men.
+
+```{r}
+mature_hus2 <- acitelli %>%
+  filter(gender == 1) %>%
+  mutate(wise_hus = Yearsmar > median(Yearsmar)) %>%
+  rename(self_positivity = self_pos,
+         other_positivity = other_pos,
+         personID = cuplid) %>%
+  arrange(wise_hus) %>%
+  select(-gender)
+```
+
+Save a dataset of women who are perceiving above the mean tension, and drop the `simhob` variable.
+
+```{r}
+
+```
+
+What are the couple ID's of the couples with the lowest 3 average satisfaction scores?
+
+```{r}
+
+```
+
 
