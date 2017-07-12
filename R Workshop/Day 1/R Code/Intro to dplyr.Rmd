@@ -210,7 +210,7 @@ acitelli <- acitelli %>%
 ```
 
 
-###Pipelines
+##Pipelines
 
 We now seen our first piplines, using `group_by()`. Now we can make a pipeline of many of the commands I did above. The last thing I do is drop useless `gender` variable, because the resulting dataset if all men.
 

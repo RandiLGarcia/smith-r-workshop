@@ -1,0 +1,60 @@
+---
+title: "Correlation Matrices, Reliability Tests, and t-Tests"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
+```
+
+***
+
+```{r}
+acitelli <- read.csv("/Users/randigarcia/Desktop/acitelli.csv", header=TRUE)
+```
+
+```{r}
+#install.packages("psych")
+library(psych)
+```
+
+#Correlation Matrix
+
+```{r}
+corr.test(select(acitelli, tension, self_pos, other_pos, satisfaction))
+```
+
+#Cronbach's alpha
+
+```{r}
+alpha(select(acitelli, simhob, other_pos, satisfaction))
+```
+
+#t-Tests
+
+##Independent Samples t-Test
+
+```{r}
+t.test(satisfaction ~ Gender, data = acitelli)
+```
+
+```{r}
+t.test(satisfaction ~ Gender, data = acitelli, var.equal = TRUE)
+```
+
+##Paired Samples t-Test
+
+```{r}
+t.test(self_pos, other_pos, data = acitelli, paired = TRUE)
+```
+

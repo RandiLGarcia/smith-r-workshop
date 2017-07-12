@@ -23,13 +23,25 @@ knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all outpu
 acitelli <- read.csv("/Users/randigarcia/Desktop/acitelli.csv", header=TRUE)
 ```
 
+```{r}
+acitelli <- acitelli %>%
+  mutate(Gender = ifelse(gender == -1, "Women", "Men"))
+```
+
+
 #Visualizing Data
 
-There are quite a few ways to make figures in R, we'll the popular package `ggplot2`. The easiest way to make a figure with `ggplot2` is with the `qplot()` function. This stands for *quick plot*.  
+There are quite a few ways to make figures in R, we'll the popular package `ggplot2`. You can find a cheat sheet for `ggplot2` here: https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf.  
+
+```{r}
+#install.packages("ggplot2")
+library(ggplot2)
+```
+
 
 ##Quick Histogram
 
-First, let's make a histogram for satisfaction. Notice in the code below that we did not specify histogram, `qplot()` guesses which type of plot we want based on the variable's type. 
+First, let's make a histogram for satisfaction. The easiest way to make a figure with `ggplot2` is with the `qplot()` function. This stands for *quick plot*.  Notice in the code below that we did not specify anything about a histogram. `qplot()` guesses which type of plot we want based on the variable's type. 
 
 ```{r, fig.width = 6, fig.height = 4}
 qplot(satisfaction, data = acitelli)
@@ -38,7 +50,15 @@ qplot(satisfaction, data = acitelli)
 There are too many bins (it defaults to 30 bins), we can ask for a specific number by adding the `bins = ` argument. Try playing around the bin number below to find the optimal plot. I put `30` in there as a placeholder.
 
 ```{r}
-qplot(satisfaction, data = acitelli, bins = 30)
+qplot(satisfaction, data = acitelli, bins = 10)
+```
+
+```{r}
+qplot(x = satisfaction, fill = Gender, data = acitelli, bins = 10)
+```
+
+```{r}
+qplot(x = satisfaction, color = Gender, data = acitelli, geom = "density")
 ```
 
 ##Quick Scatterplot
@@ -52,7 +72,7 @@ qplot(x = tension, y = satisfaction, data = acitelli)
 We can even add a third variable, mapping it to color. To get the behavior we want, gender has to be a categorical variable, to do this we can use the `as.factor()` function.
 
 ```{r, fig.width = 6, fig.height = 4}
-qplot(x = tension, y = satisfaction, color = as.factor(gender), data = acitelli)
+qplot(x = tension, y = satisfaction, color = Gender, data = acitelli)
 ```
 
 ##Quick Boxplots
@@ -65,41 +85,79 @@ qplot(y = satisfaction, x = wise_hus, data = menOnly, geom = "boxplot")
 
 ##`ggplot()`
 
-For more complex figures we will need to move away from using the `qplot` function in favor of the heavy duty `ggplot` function. 
-
-```{r, fig.width = 6, fig.height = 4}
-ggplot(riggsi, aes(x = Avoid, y = Sat, group = Genderstring, color = Genderstring)) +
-         geom_point() + 
-         geom_smooth(method = "lm", se = 0)
-```
- 
-You can find a cheat sheet for `ggplot2` here: https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf.  
- 
-##Statistical Modeling and Inference in R
-
-Independent samples t-test.
+For more complex figures we will need to move away from using the `qplot` function in favor of the heavy duty `ggplot()` function. 
 
 ```{r}
-t.test(Sat ~ legal, data = menOnly, var.equal = TRUE)
+ggplot()
 ```
-
-Paired samples t-test.
 
 ```{r}
-t.test(Sat, Avoid, data = menOnly, paired = TRUE)
+ggplot(acitelli, aes(x = satisfaction))
 ```
-
-Linear regression.
 
 ```{r}
-mod <- lm(Sat ~ Avoid + legal, data = menOnly)
-
-summary(mod)
+ggplot(acitelli, aes(x = satisfaction)) +
+  geom_histogram()
 ```
 
-Regression diagnostics.
+```{r}
+ggplot(acitelli, aes(x = satisfaction)) +
+  geom_histogram(bins = 12)
+```
 
-```{r, fig.width = 6, fig.height = 4}
-plot(mod)
+```{r}
+ggplot(acitelli, aes(x = satisfaction, fill = Gender)) +
+  geom_histogram(bins = 12)
+```
+
+```{r}
+ggplot(acitelli, aes(x = satisfaction)) +
+  geom_histogram(bins = 12) +
+  facet_wrap(~Gender)
+```
+
+```{r}
+ggplot(acitelli, aes(x = tension, y = satisfaction)) +
+  geom_point()
+```
+
+```{r}
+ggplot(acitelli, aes(x = tension, y = satisfaction)) +
+  geom_jitter()
+```
+
+```{r}
+ggplot(acitelli, aes(x = tension, y = satisfaction)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", se = 0)
+```
+
+```{r}
+ggplot(acitelli, aes(x = tension, y = satisfaction, color = Gender)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", se = 0)
+```
+
+```{r}
+ggplot(acitelli, aes(x = tension, y = satisfaction)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", se = 0) +
+  facet_wrap(~Gender)
+```
+
+```{r}
+myplot <- ggplot(acitelli, aes(x = tension, y = satisfaction, color = Gender, linetype = Gender)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", se = 0)
+
+myplot
+```
+
+```{r}
+myplot + 
+  xlab("Tension") +
+  ylab("Satisfaction") +
+  scale_color_manual(values = c("gold", "dodgerblue")) +
+  theme_classic()
 ```
 
