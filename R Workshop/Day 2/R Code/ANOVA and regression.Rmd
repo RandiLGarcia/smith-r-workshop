@@ -36,7 +36,7 @@ data(bfi)
 
 Before we get into the ANOVA, we should first create all of our scale scores. 
 
-```{r}
+```{r, results='hide'}
 corr.test(select(bfi, A1, A2, A3, A4, A5))
 corr.test(select(bfi, C1, C2, C3, C4, C5))
 corr.test(select(bfi, E1, E2, E3, E4, E5))
@@ -89,12 +89,18 @@ A better thing to do would be to check for differences with a one-way anova.
 
 ##One-Way ANOVA
 
-Perform a one-way ANOVA for education level on concientousness. Let's first look at the distributions of conscientiousness by education level. Note that we're piping a datset right into `ggplot()`.
+Perform a one-way ANOVA for education level on concientousness. Let's first look at the distributions of conscientiousness by education level. Note that first we're changing the education variable's type from integer to factor with the `as.factor()` function and giving nice labels to the factor levels.
 
 ```{r}
-bfi %>%
-  mutate(education = as.factor(education)) %>%
-ggplot(aes(x = education, y = conscient, fill = education)) +
+bfi <- bfi %>%
+  mutate(education = as.factor(education),
+         education = factor(education, labels=c('HS', 
+                                                'finished HS', 
+                                                'some college', 
+                                                'college graduate', 
+                                                'graduate degree')))
+
+ggplot(bfi, aes(x = education, y = conscient, fill = education)) +
   geom_boxplot(alpha = .5) 
 ```
 
@@ -121,18 +127,9 @@ mod1 <- aov(conscient ~ education, data = bfi)
 summary(mod1)
 ```
 
-There are no statistically significant differences between people with different education levels in conscientiousness. We might want a bar graph anyway. 
+There are statistically significant differences between people with different education levels in conscientiousness, *F*(4, 2485) = 5.67, *p* < .001. We might want a bar graph for publication! 
 
 ```{r}
-#For nice labels for education level
-bfi <- bfi %>%
-  mutate(education = as.factor(education),
-         education = factor(education, labels=c('HS', 
-                                                'finished HS', 
-                                                'some college', 
-                                                'college graduate', 
-                                                'graduate degree')))
-
 #A small companion dataset for making error bars         
 plotdata <- bfi %>% 
   group_by(education) %>%
@@ -158,69 +155,87 @@ ggplot(plotdata, aes(x = education,
 
 ##Two-Way ANOVA
 
-First let's do some data stuff we'll need.
+First let's do some data stuff we will need. For the Levene's Test we will create the gender X education levels with the `unite()` function.
 
 ```{r}
 #install.packages("tidyr")
 library(tidyr)
 
-?unite
-
 bfi <- bfi %>%
-  mutate(gender = as.character(factor(gender, labels=c('Men', 'Women'))),
-         education = as.character(education))
+  unite(gen_edu, gender, education, remove = FALSE) %>%
+  mutate(gender = as.factor(factor(gender, labels=c('Men', 'Women'))),
+         gen_edu = as.factor(gen_edu))
 ```
-
 
 Two-way ANOVA for gender by education level on conscientiousness. We can get `favstats()` split by another categorical variable with the `|` symbol. It's above your `return` key.
 
 ```{r}
-favstats(conscient ~ gender|education, data = bfi)
+favstats(conscient ~ education|gender, data = bfi)
 ```
 
 Alternatively we can use `dplyr`
 
 ```{r}
 bfi %>%
-  group_by(gender, education) %>%
+  group_by(gender, education) %>% #could also use gen_edu here
   summarise(M = mean(conscient, na.rm = TRUE),
             Md = median(conscient, na.rm = TRUE),
             SD = sd(conscient, na.rm = TRUE))
 ```
 
-Now we perform the two-way ANOVA.
+Let's check our assumption of homogeneity of variance. 
 
 ```{r}
-
+leveneTest(bfi$conscient, bfi$gen_edu)
 ```
 
-Bar graph
+Because Levene's Test is non-significant we have evidence of homogeneity of variance (really, no evidence of heterogeneity of variance). Now we perform the two-way ANOVA.
 
 ```{r}
-plotdata <- expdata %>% 
-  group_by(bio_sex, gender_expression) %>%
-  summarise(mean = mean(hirability), 
-            stdv = sd(hirability), 
+mod2 <- aov(conscient ~ education*gender, data = bfi)
+
+summary(mod2)
+```
+
+There is a statistically signficant main effect of gender, *F*(1, 2480) = 17.14, *p* < .001, such that, women (*M* = 4.36, *SD* = 0.93) are more conscientious than men (*M* = 4.18, *SD* = 0.96). These main effects are qualified by a statistically significant two-way interaction of eduation and gender, *F*(4, 2480) = 2.56, *p* = .037. Let's make a bar graph!
+
+```{r}
+plotdata <- bfi %>% 
+  group_by(gender, education) %>%
+  summarise(mean = mean(conscient, na.rm = TRUE), 
+            stdv = sd(conscient, na.rm = TRUE), 
             n = n()) %>%
   mutate(se = stdv/sqrt(n))
 
-ggplot(plotdata, aes(x = factor(bio_sex), y = mean, fill = factor(gender_expression))) +
+ggplot(plotdata, aes(x = education, y = mean, fill = gender)) +
   geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_errorbar(aes(ymax = mean + se, ymin = mean - se), position = position_dodge(0.9), width = 0.25) +
-  labs(x = "bio_sex", y = "hirability_average") +
-  ggtitle("hirability by biological sex and gender expression") +
-  scale_fill_discrete(name = "gender expression")
+  labs(x = "Education", y = "Conscientiousness") +
+  ggtitle("Conscientiousness by Gender and Education Level") +
+  scale_fill_discrete(name = "Gender")
 ```
+
+As we see in the graph (and you saw yesterday from the t-tests), women are higher than men in conscientiousness for every level of education expect for those participants that did not finish high school. 
+
+Try fiddling with the graph. Change the theme, change the labels. See if you can find on the internet how to change the colors. 
+
+```{r}
+#Copy and paste the bar graph code above to start fiddling with it.
+```
+
 
 We will see another example of a two-way ANOVA in the reproducible APA style document.
 
-##Mixed Effects ANOVA
+##Mixed Effects ANOVA (Split-Plot)
 
-To demonstrate paired samples t-test I'd like to use yet another built in dataset. The `sat.act` dataset has information for 700 people on their SAT verbal, SAT quantitative, and ACT scores.
+To demonstrate the mixed effects ANOVA we'll use the `sat.act` dataset. Recall that the `sat.act` dataset has information for 700 people on their SAT verbal, SAT quantitative, and ACT scores.
 
 ```{r}
+#?sat.act
 data(sat.act)
 ```
+
+Recall from yesterday that boys were higher on the SAT quantitative than the SAT verbal (on average) and the girls had the opposite test patterns. 
 
 ```{r}
 sat.act %>%
@@ -234,45 +249,134 @@ sat.act %>%
   t.test(SATV, SATQ, data = ., paired = TRUE)
 ```
 
-Gender by topic two-way mixed effectcs ANOVA
+We can test if these two patterns are statistically different from each other with a gender (**between-subjects**) by topic (**within-subjects**) two-way mixed effectcs ANOVA. Where topic has two levels: 1) Verbal and 2) quantitative. We have to restructure our data first.
 
 ```{r}
+n <- nrow(sat.act)
 
+sat.act <- sat.act %>%
+  mutate(id = seq.int(n))
+
+sat.act_long <- sat.act %>%
+  gather(topic, score, SATV, SATQ) %>%
+  mutate(gender = as.factor(factor(gender, labels=c('Boys', 'Girls'))),
+         topic = as.factor(topic)) %>%
+  arrange(id)
 ```
 
-Gender by education by topic three-way mixed effects ANOVA
+After you've taken a good look at the data, it's time for the ANOVA.
 
 ```{r}
+mod3 <- aov(score ~ gender + Error(id/gender) + topic*gender, 
+            data = sat.act_long)
 
+summary(mod3)
+```
+
+As we may have guessed from our preliminary analyses, there is a main effect of gender, *F*(1, 1381) = 8.35, *p* = .004, no main effect of topic, *F*(1, 1381) = 0.11, *p* = .738, but a significant interaction of gender and topic, *F*(1, 1381) = 7.71, *p* = .006. 
+
+```{r}
+plotdata <- sat.act_long %>% 
+  group_by(gender, topic) %>%
+  summarise(mean = mean(score, na.rm = TRUE), 
+            stdv = sd(score, na.rm = TRUE), 
+            n = n()) %>%
+  mutate(se = stdv/sqrt(n))
+
+ggplot(plotdata, aes(x = topic, y = mean, fill = gender)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
+  geom_errorbar(aes(ymax = mean + se, ymin = mean - se), position = position_dodge(0.9), width = 0.25) +
+  labs(x = "Topic", y = "Score") +
+  ggtitle("Score by Gender and Topic") +
+  scale_fill_discrete(name = "Gender")
+```
+
+It looks as though there are only gender differences on the SATQ, but not the SATV. Follow this up with two t-test of gender for each topic. Hint: use the `sat.act` data and the `filter()` function.  
+
+```{r}
+#two independent samples t-tests here. 
 ```
 
 #Regression
 
-What if we wanted to treat `education` like an interval measured variable instead of ordinal? We could then regress concientiousness on education in a simple linear regression model. 
+Back to the `bfi` dataset. What if we wanted to treat `education` like an interval measured variable instead of ordinal? We could then regress concientiousness on education in a simple linear regression model. First, let's clear our environment and re-load the data. 
 
 ```{r}
+data(bfi)
 
+bfi <- bfi %>%
+  mutate(C4.r = (min(C4, na.rm = TRUE) + max(C4, na.rm = TRUE)) - C4,
+         C5.r = (min(C5, na.rm = TRUE) + max(C5, na.rm = TRUE)) - C5,
+         conscient = (C1 + C2 + C3 + C4.r + C5.r)/5)
 ```
 
-Let's add gender to make it a multiple regression model. 
+It's good practice to make a scatterplot before running a regression. Do this using `ggplot2`. You might want to try using `geom_jitter()`. Also, add a linear regression line using `geom_smooth(method = "lm")`. 
 
 ```{r}
-
+#make a scatter plot here. 
 ```
 
-We can also add interactions. In R we actually don't need to specify the main effects, they'll be added for us. difference between `*` and `:`
+Now let's run our model using the `lm()` function.
 
 ```{r}
+mod4 <- lm(conscient ~ education, data = bfi)
 
+summary(mod4)
 ```
+
+There is no statistically significant effect of education on conscientiousness using a linear regression model. Let's check our regression diagnostics. This is one of the benefits of R, we can use the `plot()` function.
+
+```{r}
+plot(mod4)
+```
+
+Let's add gender as a factor to make it a multiple regression model. Note that we can also get the confidence intervals.  
+
+```{r}
+mod5 <- lm(conscient ~ education*as.factor(gender), data = bfi)
+
+summary(mod5)
+confint(mod5)
+```
+
+Check the residuals for `mod5`
+
+```{r}
+#use the plot() function here
+```
+
+Try making a figure that splits the slope of education on conscientiousness by gender. Copy and past from yesterday's code if you'd like. 
+
+```{r}
+#regression lines split by gender
+```
+
 
 ##Logistic Regression
 
 Because personality is relatively stable, we may instead ask are people who are more concientious more likely to graduate from college? This would be a logistic regression model. We can use the code we wrote yesterday for creating the dichotomous variable 1 = yes college, 0 = no college. 
 
 ```{r}
-
+bfi <- bfi %>%
+  mutate(coll_grad = (education > 3))
 ```
+
+Then we can run our model by using the `glm()` function and adding `family = binomial`.
+
+```{r}
+mod6 <- glm(coll_grad ~ conscient, data = bfi, family = binomial)
+
+summary(mod6)
+confint(mod6)
+```
+
+It's handy to look at the exponentiated estimates using the `exp()` function. 
+
+```{r}
+exp(coef(mod6))
+```
+
+You are 0.92 times as likely to go graduate from college for every 1 unit increase in conscienciousness, but this is only mariginally significant, *p* = .073. 
 
 
 

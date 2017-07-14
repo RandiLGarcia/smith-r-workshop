@@ -41,7 +41,7 @@ fontsize: 12 pt
 ##Day 2: Data Analysis in R
 
   + Morning Session 9-12
-    - ANOVA, Regression, and Logistic regression
+    - [ANOVA, Regression, and Logistic regression](ANOVA_and_regression.html)
     - Preparing APA style manuscripts in RMarkdown with `papaja`
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
