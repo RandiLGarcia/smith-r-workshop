@@ -27,10 +27,8 @@ fontsize: 12 pt
     - Descriptive Statistics
   + Lunch 12:00 PM to 1:15 PM 
   + Afternoon Session 1:15-3:30
-    - Making Figures with `ggplot2`
-    - Correlations
-    - Reliability Test
-    - Independent and Paired Samples t-Tests
+    - [Making Figures with `ggplot2`](Intro_to_ggplot2.html)
+    - [Correlations, Reliability Test, and t-Tests](Corr_reliability_ttest.html)
   + Resources for more practice
     - [`dplyr` lab](https://beanumber.github.io/sds192/lab-single_table.html)
     - [`dplyr` lab 2](https://beanumber.github.io/sds192/lab-group_by.html)
@@ -43,8 +41,7 @@ fontsize: 12 pt
 ##Day 2: Data Analysis in R
 
   + Morning Session 9-12
-    - ANOVA 
-    - Regression and Logistic regression
+    - ANOVA, Regression, and Logistic regression
     - Preparing APA style manuscripts in RMarkdown with `papaja`
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
@@ -60,13 +57,12 @@ fontsize: 12 pt
 
   + Morning Session 9-12
     - Two-level Linear Models with `lme4`
-    - Data Manipulation with `tidyr`
-    - Longitudinal Growth Curve Modeling
     - Generalized Linear Mixed Models
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
+    - Data Manipulation with `tidyr`
     - Dyadic Data Analysis with `nlme` and `dyadr`
-    - Dyadic Growth Curve Modeling 
+    - Individual and Dyadic Growth Curve Modeling 
   + Resources for more practice
     - [`tidyr` lab 4](https://beanumber.github.io/sds192/lab-tidy.html)
     - [Week long Dyadic Workshop](https://randilgarcia.github.io/week-dyad-workshop/)

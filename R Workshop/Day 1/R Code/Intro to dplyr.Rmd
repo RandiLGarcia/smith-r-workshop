@@ -20,7 +20,7 @@ knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all outpu
 ***
 
 ```{r}
-acitelli <- read.csv("/Users/randigarcia/Desktop/acitelli.csv", header=TRUE)
+acitelli <- read.csv(file.choose(), header=TRUE)
 ```
 
 #Data Manipulation (data cleaning)

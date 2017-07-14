@@ -53,7 +53,7 @@ Write notes for yourself in the white space. Maybe explain to your future self w
 Enough playing around, let's load some data!
 
 ```{r}
-acitelli <- read.csv(file.chose(), header=TRUE)
+acitelli <- read.csv(file.choose(), header=TRUE)
 ```
 
 Next, you want to look at your data.

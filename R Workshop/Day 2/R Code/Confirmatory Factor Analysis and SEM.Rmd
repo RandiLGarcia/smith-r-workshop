@@ -1,0 +1,36 @@
+---
+title: "Confirmatory Factor Analysis"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
+```
+
+***
+
+```{r}
+library(mosaic)
+library(ggplot2)
+library(dplyr)
+library(psych)
+```
+
+```{r}
+#install.packages("lavaan")
+library(lavaan)
+```
+
+
+#Confirmatory Factor Analysis
+
