@@ -31,6 +31,79 @@ library(psych)
 library(lavaan)
 ```
 
-
 #Confirmatory Factor Analysis
+
+```{r}
+bf_model <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
+              conscient =~ C1 + C2 + C3 + C4 + C5
+              extrov =~ E1 + E2 + E3 + E4 + E5
+              neurot =~ N1 + N2 + N3 + N4 + N5
+              openness =~ O1 + O2 + O3 + O4 + O5 '
+
+bf_fit <- cfa(bf_model, data = bfi)
+
+
+summary(bf_fit, fit.measures = TRUE, rsq=TRUE)
+inspect(bf_fit, what = "std")
+```
+
+```{r}
+modindices(bf_fit) %>% 
+  arrange(desc(mi))
+```
+
+Add error covariances based on modificaton indicies.
+
+```{r}
+bf_model_re1 <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
+                  conscient =~ C1 + C2 + C3 + C4 + C5
+                  extrov =~ E1 + E2 + E3 + E4 + E5
+                  neurot =~ N1 + N2 + N3 + N4 + N5
+                  openness =~ O1 + O2 + O3 + O4 + O5 
+                    
+                  N1 ~~ N2
+                  N3 ~~ N4'
+
+bf_fit_re1 <- cfa(bf_model_re1, data = bfi)
+
+
+summary(bf_fit_re1, fit.measures = TRUE, rsq=TRUE)
+inspect(bf_fit_re1, what = "std")
+```
+
+```{r}
+modindices(bf_fit_re1) %>% 
+  arrange(desc(mi))
+```
+
+Remove A1 -- "Am indifferent to the feelings of others," and O4 -- "Spend time reflecting on things," based on crappy loadings.
+
+```{r}
+bf_model_re2 <- ' agreeable =~ A2 + A3 + A4 + A5
+                  conscient =~ C1 + C2 + C3 + C4 + C5
+                  extrov =~ E1 + E2 + E3 + E4 + E5
+                  neurot =~ N1 + N2 + N3 + N4 + N5
+                  openness =~ O1 + O2 + O3 + O5 
+                    
+                  N1 ~~ N2
+                  N3 ~~ N4'
+
+bf_fit_re2 <- cfa(bf_model_re2, data = bfi)
+
+
+summary(bf_fit_re2, fit.measures = TRUE, rsq=TRUE)
+inspect(bf_fit_re2, what = "std")
+```
+
+```{r}
+modindices(bf_fit_re2) %>% 
+  arrange(desc(mi))
+```
+
+```{r}
+fitmeasures(bf_fit)[9]
+fitmeasures(bf_fit_re1)[9]
+fitmeasures(bf_fit_re2)[9]
+```
+
 
