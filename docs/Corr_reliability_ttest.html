@@ -257,7 +257,7 @@ div.tocify {
 <h1>Data inside R packages</h1>
 <p>To demonstrate the use of the <code>alpha()</code> fuction in the <code>psych</code> package from computing Cronbach’s alpha, we will need a data set with scale items. Many packages have example datasets pre-loaded. The <code>psych</code> package has a dataset called <code>bfi</code> that has n = 2800 participants responding to 25 personality itmes for the Big Five Inventory.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#We can see a list of ALL the datasets current avaliable</span>
-<span class="kw">data</span>()</code></pre></div>
+<span class="co">#data()</span></code></pre></div>
 <p>If we see a dataset we like we can load it into our environment</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(bfi)
 <span class="co">#?bfi</span>
@@ -335,7 +335,7 @@ div.tocify {
 <p>Now compute correlation matrices for the other 4 personality subscales and create any reverse scored items the need to be created.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#correlation matrices and reverse scored items</span></code></pre></div>
 <p>For more practice, find another dataset that sounds interesting and run some correlation matricies.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#data()</span></code></pre></div>
 </div>
 <div id="cronbachs-alpha" class="section level1">
 <h1>Cronbach’s alpha</h1>
@@ -418,7 +418,7 @@ ds &lt;-<span class="st"> </span><span class="kw">favstats</span>(agreeable ~<sp
 ## sample estimates:
 ## mean in group 1 mean in group 2 
 ##        4.377679        4.774848</code></pre>
-<p>Test for gender differences for the other 4 scales. Test for gender differences between those who graduated college, and those who did not. Hint: use <code>mutate()</code> to create a dichotomous variable as we did for <code>wise_hus</code>.</p>
+<p>Test for gender differences for the other 4 scales. Then test differences between those who graduated college, and those who did not. Hint: use <code>mutate()</code> to create a dichotomous variable as we did for <code>wise_hus</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#more t-Tests</span></code></pre></div>
 </div>
 <div id="paired-samples-t-test" class="section level2">
@@ -480,6 +480,18 @@ ds &lt;-<span class="st"> </span><span class="kw">favstats</span>(agreeable ~<sp
 <p>Explore the differences in <code>SATV</code> and <code>SATQ</code> for each level of the <code>education</code> variable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#differences for each level of education</span></code></pre></div>
 </div>
+</div>
+<div id="chi-square-test" class="section level1">
+<h1>Chi-Square Test</h1>
+<p>Here is a bonus chi-sqaure test to test if education is associated with gender. Question: Is degree attainment related to gender?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">counts &lt;-<span class="st"> </span><span class="kw">tally</span>(gender~education, <span class="dt">data =</span> <span class="kw">filter</span>(bfi, !<span class="kw">is.na</span>(education)))
+
+<span class="kw">chisq.test</span>(counts)</code></pre></div>
+<pre><code>## 
+##  Pearson's Chi-squared test
+## 
+## data:  counts
+## X-squared = 21.672, df = 4, p-value = 0.0002329</code></pre>
 </div>
 
 

@@ -43,8 +43,6 @@ cor.plot(r_matrix)
 
 ```{r}
 fa(r_matrix, nfactors = 5)
-
-?fa
 ```
 
 ```{r}

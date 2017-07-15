@@ -34,7 +34,7 @@ To demonstrate the use of the `alpha()` fuction in the `psych` package from comp
 
 ```{r}
 #We can see a list of ALL the datasets current avaliable
-data()
+#data()
 ```
 
 If we see a dataset we like we can load it into our environment 
@@ -86,12 +86,12 @@ Now compute correlation matrices for the other 4 personality subscales and creat
 For more practice, find another dataset that sounds interesting and run some correlation matricies.
 
 ```{r}
-data()
+#data()
 ```
 
 #Cronbach's alpha
 
-Now that we have our reverse scored items and we have a sense of how the items relate, the next step is to test the scale reliability. We do this with Cronbach's alpha. There is a function called `alpha()` in the `psych` package. 
+Now that we have our reverse scored items and we have a sense of how the items relate, the next step is to test the scale reliability. We do this with Cronbach's alpha. There is a function called `alpha()` in the `psych` package.   
 
 ```{r}
 alpha(select(bfi, A1.r, A2, A3, A4, A5))
@@ -189,5 +189,16 @@ Explore the differences in `SATV` and `SATQ` for each level of the `education` v
 
 ```{r}
 #differences for each level of education
+```
+
+
+#Chi-Square Test
+
+Here is a bonus chi-sqaure test to test if education is associated with gender. Question: Is degree attainment related to gender?
+
+```{r}
+counts <- tally(gender~education, data = filter(bfi, !is.na(education)))
+
+chisq.test(counts)
 ```
 
