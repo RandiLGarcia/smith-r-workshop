@@ -24,6 +24,9 @@ library(mosaic)
 library(ggplot2)
 library(dplyr)
 library(psych)
+
+#install.packages("GPArotation")
+library(GPArotation)
 ```
 
 #Exploratory Factor Analysis
@@ -38,104 +41,28 @@ r_matrix <- corr.test(select(bfi, -gender, -education, -age))$r
 cor.plot(r_matrix)
 ```
 
-Test for gender differences in concientiouness between those who graduated college, and those who did not. Hint: use `mutate()` to create a dichotomous variable as we did for `wise_hus`. 
-
 ```{r}
-#more t-Tests
-```
+fa(r_matrix, nfactors = 5)
 
-A better thing to do would be to check for differences with a one-way anova.
-
-##One-Way ANOVA
-
-Perform a one-way ANOVA for education level on concientousness.
-
-```{r}
-
-```
-
-Bar graph
-
-```{r}
-
-```
-
-
-##Two-Way ANOVA
-
-Two-way ANOVA for gender by education level on concientiouness
-
-```{r}
-
-```
-
-Bar graph
-
-```{r}
-
-```
-
-We will see another example of a two-way ANOVA in the reproducible APA style document.
-
-##Mixed Effects ANOVA
-
-To demonstrate paired samples t-test I'd like to use yet another built in dataset. The `sat.act` dataset has information for 700 people on their SAT verbal, SAT quantitative, and ACT scores.
-
-```{r}
-data(sat.act)
+?fa
 ```
 
 ```{r}
-sat.act %>%
-  filter(gender == 1) %>%
-  t.test(SATV, SATQ, data = ., paired = TRUE)
+pc <- principal(Harman74.cor$cov,4,rotate="varimax")   #principal components
+pa <- fa(Harman74.cor$cov,4,fm="pa" ,rotate="varimax")  #principal axis 
+uls <- fa(Harman74.cor$cov,4,rotate="varimax")          #unweighted least squares is minres
+wls <- fa(Harman74.cor$cov,4,fm="wls")  
+
+#then compare with a maximum likelihood solution using factanal
+mle <- factanal(covmat=Harman74.cor$cov,factors=4)
+
+#finally, compare the unrotated factor, ml, uls, and  wls solutions
+wls <- fa(Harman74.cor$cov,4,rotate="none",fm="wls")
+pa <- fa(Harman74.cor$cov,4,rotate="none",fm="pa")
+minres <-  factanal(factors=4,covmat=Harman74.cor$cov,rotation="none")
+mle <- fa(Harman74.cor$cov,4,rotate="none",fm="mle")
+uls <- fa(Harman74.cor$cov,4,rotate="none",fm="uls")
+factor.congruence(list(minres,mle,pa,wls,uls))
 ```
-
-```{r}
-sat.act %>%
-  filter(gender == 2) %>%
-  t.test(SATV, SATQ, data = ., paired = TRUE)
-```
-
-Gender by topic two-way mixed effectcs ANOVA
-
-```{r}
-
-```
-
-Gender by education by topic three-way mixed effects ANOVA
-
-```{r}
-
-```
-
-#Regression
-
-What if we wanted to treat `education` like an interval measured variable instead of ordinal? We could then regress concientiousness on education in a simple linear regression model. 
-
-```{r}
-
-```
-
-Let's add gender to make it a multiple regression model. 
-
-```{r}
-
-```
-
-We can also add interactions. In R we actually don't need to specify the main effects, they'll be added for us. difference between `*` and `:`
-
-```{r}
-
-```
-
-##Logistic Regression
-
-Because personality is relatively stable, we may instead ask are people who are more concientious more likely to graduate from college? This would be a logistic regression model. We can use the code we wrote yesterday for creating the dichotomous variable 1 = yes college, 0 = no college. 
-
-```{r}
-
-```
-
 
 
