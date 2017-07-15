@@ -1,5 +1,5 @@
 ---
-title: 'Dyadic Data Analysis'
+title: "Dyadic Data Analysis"
 output:
   html_document:
     highlight: pygments
@@ -23,8 +23,15 @@ Read in the individual data (or a pairwise dataset)
 
 ```{r, error=TRUE}
 library(tidyr)
-library(dplyr)
+
+#install.packages("devtools")
+#library(devtools)
+#install_github("RandiLGarcia/dyadr")
+library(dyadr)
+
+#install.packages("nlme")
 library(nlme)
+library(dplyr)
 
 acitelli_ind <- read.csv(file.choose(), header=TRUE)
 ```
@@ -62,62 +69,48 @@ apim_in <- gls(satisfaction_A ~ other_pos_A + other_pos_P,
                correlation = corCompSymm(form=~1|cuplid),
                na.action = na.omit)
 
-summary(apim_in)
-names(apim_in)
+smallsummary(apim_in)
 ```
 
 ##Effect Sizes
 To compute effect sizes, we use partial correlations.
 
 ```{r}
-library(MASS)
+#install.packages("ppcor")
 library(ppcor)
-         as.numeric(pcor.test(riggsp$Anxiety_A,riggsp$Sat_A,riggsp$Anxiety_P)[1])
-         as.numeric(pcor.test(riggsp$Anxiety_P,riggsp$Sat_A,riggsp$Anxiety_A)[1])
+
+pcor.test(acitelli_pair$other_pos_A, acitelli_pair$satisfaction_A, acitelli_pair$other_pos_P)[1,1]
+pcor.test(acitelli_pair$other_pos_P, acitelli_pair$satisfaction_A, acitelli_pair$other_pos_A)[1,1]
 ```
 
-The effect size for actor is -.311, a moderate effect, and for partner -.228, a small effect. 
+The effect size for actor is .423, a moderate effect, and for partner .318, a moderate effect. 
 
 ##Multiple Correlation
-
-The multiple correlation squared can be computed by comparing the error variance for the model to a model with no predictors.
-
-```{r}
-# Empty Model
-        apimie = summary(gls(Sat_A ~ 1 , 
-                     na.action=na.omit, 
-                     correlation=corCompSymm (form=~1|Dyad),
-                     data=riggsp))
-# sd of errors for the model
-        esd = as.numeric(apimi[6])
-# sd of errors for the empty model
-                esd0 = as.numeric(apimie[6])
-# the R squared, using the crsp function                
-        crsp (esd,esd0)
-```
-
-##Pseudo-R^2^  
 
 How much variance in the response variable does the actor and partner effects explain together? First we run the empty model so that we can get the total variance in the response---which we need to calculate the pseudo-R^2^.
 
 ```{r}
-apim_in_empty <- gls(satisfaction_A ~ 1,
-                     data = acitelli_pair,
-                     correlation = corCompSymm(form=~1|cuplid),
-                     na.action = na.omit)
+# Empty Model
+apimie <- gls(satisfaction_A ~ 1 , 
+              na.action=na.omit, 
+              correlation=corCompSymm (form=~1|cuplid),
+              data=acitelli_pair)
 
-summary(apim_in_empty)
+summary(apimie)
+
+# sd of errors for the model
+esd <- as.numeric(apim_in[6])
+
+# sd of errors for the empty model
+esd0 <- as.numeric(apimie[6])
+
+# the R squared, using the crsp function                
+crsp(esd, esd0)
 ```
 
 ```{r}
 #This will perform a likilihood ratio test for the set of all fixed effects in the model.
-anova(apim_in, apim_in_empty)
-```
-
-```{r}
-#to have R calculate the pseudo-R2.
-pesudo_r2 <- 1-(apim_in$sigma^2/apim_in_empty$sigma^2)
-pesudo_r2
+anova(apim_in, apimie)
 ```
 
 `Rho`: ICC = .618470  
@@ -181,10 +174,10 @@ Or have R do it like so:
 
 ```{r}
 sep_coef <- data.frame(
-  anx_a_men = coef(apim_di_int)[2] + -1*coef(apim_di_int)[5],
-  anx_a_wom = coef(apim_di_int)[2] + 1*coef(apim_di_int)[5],
-  anx_p_men = coef(apim_di_int)[4] + -1*coef(apim_di_int)[6],
-  anx_p_wom = coef(apim_di_int)[4] + 1*coef(apim_di_int)[6],
+  othpos_a_men = coef(apim_di_int)[2] + 1*coef(apim_di_int)[5],
+  othpos_a_wom = coef(apim_di_int)[2] + -1*coef(apim_di_int)[5],
+  othpos_p_men = coef(apim_di_int)[3] + 1*coef(apim_di_int)[6],
+  othpos_p_wom = coef(apim_di_int)[3] + -1*coef(apim_di_int)[6],
   row.names = "Randi's nums")
 
 sep_coef
@@ -200,7 +193,7 @@ error_vars <- data.frame(ev_wom = getevd(apim_di_int)[1],
 error_vars
 ```
 
-6.83 is the error variance for women, and 6.64 is the error variance for men.
+0.455 is the error SD for women, and 0.378 is the error SD for men.
 
 ##Two-Intercept Approach  
 This involves a trick by which one equation becomes two.  We create two dummy variables: $H_{ij}$ which equals 1 for husbands and 0 for wives and $W_{ij}$ which equals 1 for wives and zero for husband.  We then estimate the following equation:  
@@ -247,11 +240,11 @@ rbind(sep_coef,
 We could also get R^2^ for men and women separately. 
 
 ```{r}
-apim_di_empty <- gls(Sat_A ~ Gender_A,
-                   data = riggsp,
-                   correlation = corCompSymm(form=~1|Dyad),
-                   weights = varIdent(form=~1|Genderstring),
-                   na.action = na.omit)
+apim_di_empty <- gls(satisfaction_A ~ gender_A,
+                     data = acitelli_pair,
+                     correlation = corCompSymm(form=~1|cuplid),
+                     weights = varIdent(form=~1|genderE_A),
+                     na.action = na.omit)
 
 R_sqs <- data.frame(R_sq_wom = crsp(getevd(apim_di_two)[1], 
                                     getevd(apim_di_empty)[1]),
@@ -261,22 +254,22 @@ R_sqs <- data.frame(R_sq_wom = crsp(getevd(apim_di_two)[1],
 R_sqs
 ```
 
-Pseudo R^2^ for women is 0.16, or 16% of the variance in satisfaction for women is explained by the model.  
-Pseudo R^2^ for men is 0.14, or 14% of the variance in satisfaction for men is explained by the model.  
+Pseudo R^2^ for women is 0.26, or 26% of the variance in satisfaction for women is explained by the model.  
+Pseudo R^2^ for men is 0.33, or 33% of the variance in satisfaction for men is explained by the model.  
 
 
 #Descriptive Statistics by Gender
 There are MANY ways to do this. I use the `dyplr` package.
 
 ```{r}
-riggsp %>%
-  select(Genderstring, Anxiety_A, Sat_A) %>% 
+acitelli_pair %>%
+  select(genderE_A, other_pos_A, satisfaction_A) %>% 
   na.omit() %>% #omits only if missing on the variables included in select()
-  group_by(Genderstring) %>%
-  summarise(Anxiety_A_mean = mean(Anxiety_A),
-            Anxiety_A_sd = sd(Anxiety_A),
-            Sat_A_mean = mean(Sat_A),
-            Sat_A_sd = sd(Sat_A),
+  group_by(genderE_A) %>%
+  summarise(other_pos_A_mean = mean(other_pos_A),
+            other_pos_A_sd = sd(other_pos_A),
+            satisfaction_A_mean = mean(satisfaction_A),
+            satisfaction_A_sd = sd(satisfaction_A),
             n = n())
 ```
 
@@ -289,5 +282,5 @@ plot(apim_di_int)
 qqnorm(apim_di_int$residuals)
 ```
 
-Looks pretty good to me!
+Satisfaction is skewed to the left.
 
