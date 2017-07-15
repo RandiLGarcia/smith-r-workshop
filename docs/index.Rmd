@@ -38,31 +38,32 @@ fontsize: 12 pt
 
 ***
 
-##Day 2: Data Analysis in R
+##[Day 2: Data Analysis in R](Day 2 Slides.pdf)
 
   + Morning Session 9-12
     - [ANOVA, Regression, and Logistic regression](ANOVA_and_regression.html)
     - Preparing [APA style manuscripts](Papaja.pdf) in RMarkdown with `papaja`
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
-    - Exploratory Factor Analysis (EFA) 
-    - Confirmatory Factor Analysis (CFA) with `laavan`
+    - [Exploratory Factor Analysis (EFA)](Exploratory_Factor_Analysis.html)
+    - [Confirmatory Factor Analysis (CFA) with `laavan`](Confirmatory_Factor_Analysis_and_SEM.html)
     - Intro to SEM
   + Resources for more practice
+    - [Factor Analysis with `psych`](factor.pdf)
     - [`lavaan` tutorials](http://lavaan.ugent.be/tutorial/)
 
 ***
 
-##Day 3: Multilevel Modeling in R
+##[Day 3: Multilevel Modeling in R](Day 3 Slides.pdf)
 
   + Morning Session 9-12
-    - Two-level Linear Models with `lme4`
-    - Generalized Linear Mixed Models
+    - [Two-level Linear Models with `lme4`](Multilevel_Modeling.html)
+    - [Generalized Linear Mixed Models](Generalized_Linear_Mixed_Models.html)
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
-    - Data Manipulation with `tidyr`
-    - Dyadic Data Analysis with `nlme` and `dyadr`
-    - Individual and Dyadic Growth Curve Modeling 
+    - [Data Manipulation with `tidyr`](Data_manipulation_with_tidyr.html)
+    - [Dyadic Data Analysis with `nlme` and `dyadr`](Dyadic_Data_Analysis.html)
+    - [Individual and Dyadic Growth Curve Modeling](Growth_Curve_Modeling.html)
   + Resources for more practice
     - [`tidyr` lab 4](https://beanumber.github.io/sds192/lab-tidy.html)
     - [Week long Dyadic Workshop](https://randilgarcia.github.io/week-dyad-workshop/)

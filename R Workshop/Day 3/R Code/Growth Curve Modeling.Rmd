@@ -1,0 +1,338 @@
+---
+title: "Growth Curve Modeling"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+*** 
+
+#Example Data Set: Kashy  
+Outcome: 
+
+  + `ASATISF` Satisfaction  
+  
+Predictor Variables:  
+
+  + `TIME`: time in days (there are 14 days with 0 = study midpoint).  
+  + `GENDER`: Gender effects coded (Women = -1 and Men  = 1).  
+  + `GenderS`: A string variable that labels women "Woman" and men "Man". 
+
+Moderators:  
+
+  + `CAAvoid`, `CPAvoid`: Grand mean centered attachment avoidance (Actor and Partner---a mixed moderator)   
+
+First, read in the new dataset. It's already in the person-period pairwise structure. 
+
+```{r}
+library(dyadr)
+library(dplyr)
+library(nlme)
+library(ggplot2)
+
+kashy_ppp <- read.csv(file.choose(), header=TRUE)
+```
+
+```{r, eval=FALSE}
+View(kashy_ppp)
+```
+
+
+#Individual Growth Curve Modeling
+
+First, for illustration purposes, we want to run a growth curve model for men only. We can use the Kashy data but select only men with this syntax:
+
+```{r}
+kashy_men <- kashy_ppp %>%
+  filter(GENDER == 1)
+```
+
+##Spaghetti Plot
+
+Spaghetti plot shows different slopes for different folks!
+
+```{r}
+kashy_men_small <- kashy_men %>%
+  filter(DYADID >= 1 & DYADID <= 20)
+
+ggplot(kashy_men_small, aes(TIME, ASATISF, 
+                            group = as.factor(DYADID),
+                            color = as.factor(DYADID))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+##Growth Curve for Men Only
+
+Instead of `gls()`, we use the `lme()` in the `nlme` package, but now we have occasion nested within person and no need for correlated errors. Now we are using traditional MLM and will make use of the random option instead of the correlation option in the syntax below. The random option asks `lme()` to estimate variance in the intercepts of satisfaction at `TIME` = 0 (the study midpoint), and variance in the slopes (change in satisfaction overtime). The subject is `DYADID` because this variable is serving as our participant ID---recall that we are going to use men only and this is a heterosexual sample.   
+
+```{r}
+GC_men <- lme(ASATISF ~ TIME,
+              data = kashy_men, 
+              random = ~ 1 + TIME|DYADID,
+              na.action = na.omit)
+  
+summary(GC_men)
+```
+
+We can use the `confintLME()` function in the `dyadr` package to get confidence intervals for the fixed effects.
+
+```{r}
+coef(summary(GC_men))
+confintLME(GC_men)
+```
+
+The final fixed equation is: 
+
+$$\widehat{Satisfaction} = 6.26 + .019(TIME)$$
+
+The Intercept = 6.26, which is interpreted as the average level of satisfaction at TIME = 0 (the study midpoint). The coefficient for TIME = .019. That is, over time, satisfaction increases .019 units a day. The slope is small, although it is statistically significant---thus, there is some evidence of an average increase in satisfaction over time for men.
+	
+As for the random effects, the three important estimates are: 
+
+1.	Standard deviation of Intercepts: `(Intercept)` =  .670
+2.	Standard deviation of Slopes: `TIME` =  .050
+3.	Correlation between Int/Slope: `Corr` = -.055
+
+There is positive variance in the intercepts---some men were more satisfied than others at the midpoint. There is also positive variance in the slopes---some men are changing in satisfaction more than others.  The slope-intercept covariance is in the negative direction. We would interpret this as, men with higher values at time 0 change more slowly than those with lower values.
+
+###Adding a Moderator
+
+Next, we can include the men's attachment avoidance as a moderator of the level of satisfaction at the study midpoint (main effect of avoidance), and as a moderator of the change in satisfaction over time (TIME by avoidance interaction). This is the addition of two fixed effects---the random effects remain unchanged. The interpretation of the random effects are as before, but they are interpreted with the effect of avoidance "partialled out." `CAAvoid` is grand mean centered avoidance of the actor.
+
+```{r}
+GC_men_mod <- lme(ASATISF ~ TIME + CAAvoid + TIME*CAAvoid,
+              data = kashy_men, 
+              random = ~ 1 + TIME|DYADID,
+              na.action = na.omit)
+  
+smallsummary(GC_men_mod)
+```
+
+The final fixed effects growth equation with attachment avoidance as a moderator is:
+
+$$\widehat{Satisfaction} = 6.26 + .019(TIME) -.140(Avoid) + .0045(TIME*Avoid)$$
+
+The $intercept = 6.26$, the predicted satisfaction for men at the study midpoint who are at the mean on avoidance. There is a significant main effect of time, $b = 0.019$, that is, satisfaction increases by .019 each day for men who are at the mean on avoidance. There is a significant main effect of avoidance, $b = -.140$, such that men who are higher in avoidance are less satisfied at the study midpoint than men who are lower in avoidance. There is no significant Time X Avoidance interaction, $b = .0045$, but to interpret the direction of this interaction we could calculate the slope for men who are high and low in avoidance: 
+
+```{r}
+kashy_men %>%
+  summarize(sd(CAAvoid, na.rm = TRUE))
+```
+
+$Men's Avoidance SD = 1.002$  
+
+```{r}
+High_Avoid_Slope <- .019+.0045*1.002
+Low_Avoid_Slope <- .019-.0045*1.002
+
+High_Avoid_Slope
+Low_Avoid_Slope
+```
+
+$High Avoidance (+1sd) Slope = .019 + .0045*1.002 = .0235$  
+$Low Avoidance (-1sd) Slope = .019 - .0045*1.002 = .0145$  
+
+Alternatively, we could re-center Avoidance to obtain these two values. Recall that the re-centering method will give you significance tests of the simple slopes and then you can use the `graphMod()` fucntion to make a figure.  We interpret this interaction as: men higher on avoidance become more satisfied over the course of the study than men lower on avoidance, but this difference is not significant.
+
+#Dyadic Growth Curve Modeling
+
+##Dyadic Spaghetti Plot
+
+Dyadic spaghetti plot shows different slopes for different folks (across different dyads)!
+
+```{r}
+kashy_small <- kashy_ppp %>%
+  filter(DYADID >= 1 & DYADID <= 8) 
+
+ggplot(kashy_small, aes(TIME, ASATISF, 
+                        group = as.factor(PID),
+                        color = as.factor(PID))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~as.factor(DYADID))
+```
+
+##Dyadic Growth Curve for Distinguishable Dyads
+
+###Create obsid Index Variable
+
+```{r}
+kashy_ppp <- kashy_ppp %>%
+  mutate(obsid = Day+14*(DYADID-1))
+```
+
+###Two-Intercept Approach
+
+For dyadic growth curve modeling we are going to start with a two intercept model. Note how `GenderS` is included below as well as `-1`. This will give us separate intercepts for women and men. We again use the `lme()` procedure, but now we need a `random =` statement as well as a `correlation = ` statement.  
+
+The `random =` statement estimates separate intercepts and slopes for men and women and all of the within-and-between person correlations (see slides for more description of all of these random effects).   
+
+The `correlation = ` Statement specifies the variances and covariances between the residuals.  
+
+`weights = varIdent(form = ~1|GenderS)` asks R to estimate different residual variances for men and women (set to be the same at each time point). There is one correlation between the residuals (i.e., the time-specific correlation between satisfaction scores---will be `Rho` in the output).  
+
+```{r}
+dyadGC_di_two  <- lme(ASATISF ~ GenderS + GenderS:TIME  - 1,
+                      data = kashy_ppp, 
+                      random = ~ GenderS + GenderS:TIME  - 1|DYADID,
+                      correlation = corCompSymm(form = ~1|DYADID/obsid),
+                      weights = varIdent(form = ~1|GenderS),
+                      na.action = na.omit)
+
+smallsummary(dyadGC_di_two)
+```
+
+We can also use the `lincomb()` function to test for differences between our estimates for men and women. 
+
+```{r}
+lincomb(summary(dyadGC_di_two), 1, 2) 
+lincomb(summary(dyadGC_di_two), 3, 4) 
+```
+
+Fixed Effects: 
+
+  + `GENDER`: Is the intercept different for men and women? Yes, p = .003.
+    - Male Intercept = 6.259
+    - Female Intercept = 6.388
+  + `TIME`: Do men and women have different slopes? No, men have steeper, more positive slopes than women, but not significantly so, p = .156
+    - Male slope = .0191
+    - Female slope = .0098
+
+
+###Interaction Approach
+
+Finally, as a reminder, one should include gender in the model as a moderator. We've been referring to as this as the "interaction approach." The dyadic growth curve model for the gender moderation model is as follows. 
+
+```{r}
+dyadGC_di_int  <- lme(ASATISF ~ GENDER + TIME + GENDER*TIME, 
+                      data = kashy_ppp, 
+                      random = ~ GenderS + GenderS:TIME  - 1|DYADID,
+                      correlation = corCompSymm(form = ~1|DYADID/obsid),  
+                      weights = varIdent(form = ~1|GenderS),
+                      na.action = na.omit)
+
+smallsummary(dyadGC_di_int)
+```
+
+###Adding a Moderator
+
+```{r}
+dyadGC_di_mod  <- lme(ASATISF ~ GENDER*TIME*CAAvoid + GENDER*TIME*CPAvoid,
+                      data = kashy_ppp, 
+                      random = ~ GenderS + GenderS:TIME  - 1|DYADID,
+                      correlation = corCompSymm(form = ~1|DYADID/obsid),
+                      weights = varIdent(form = ~1|GenderS),
+                      na.action = na.omit)
+
+smallsummary(dyadGC_di_mod)
+```
+
+We see that there is no statistically significant difference in the `TIME:AVOID` effects by gender, no three-way interactions. Further, gender does not moderate the actor and partner effects.  
+
+So we can run a model where gender is only included as a main effect---i.e., gender affects the intercept only. 
+
+```{r}
+dyadGC_di_mod2  <- lme(ASATISF ~ GENDER + TIME*CAAvoid + TIME*CPAvoid,
+                      data = kashy_ppp, 
+                      random = ~ GenderS + GenderS:TIME  - 1|DYADID,
+                      correlation = corCompSymm(form = ~1|DYADID/obsid),
+                      weights = varIdent(form = ~1|GenderS),
+                      na.action = na.omit)
+
+coef(summary(dyadGC_di_mod2))
+```
+
+From this model we can see that there is a statistically significant interaction of `TIME` and `CPAvoid`, which means that the change over time in satisfaction gets larger as one's partner's avoidance goes up.  
+
+The next thing we would want to do is test the simple slopes (of `TIME`) at high and low partner avoidance. We probably also want a figure. 
+
+###Graphing an Interaction
+
+First we will run the model again with:
+
+  1. high partner avoidance, and 
+  2. low partner avoidance.
+
+```{r}
+kashy_ppp <- kashy_ppp %>%
+  mutate(High_CPAvoid = CPAvoid - sd(CPAvoid, na.rm = TRUE),
+         Low_CPAvoid = CPAvoid + sd(CPAvoid, na.rm = TRUE))
+  
+  
+dyadGC_di_mod2_High  <- lme(ASATISF ~ GENDER + TIME*CAAvoid + TIME*High_CPAvoid,
+                      data = kashy_ppp, 
+                      random = ~ GenderS + GenderS:TIME  - 1|DYADID,
+                      correlation = corCompSymm(form = ~1|DYADID/obsid),
+                      weights = varIdent(form = ~1|GenderS),
+                      na.action = na.omit)
+
+dyadGC_di_mod2_Low  <- lme(ASATISF ~ GENDER + TIME*CAAvoid + TIME*Low_CPAvoid,
+                      data = kashy_ppp, 
+                      random = ~ GenderS + GenderS:TIME  - 1|DYADID,
+                      correlation = corCompSymm(form = ~1|DYADID/obsid),
+                      weights = varIdent(form = ~1|GenderS),
+                      na.action = na.omit)
+```
+
+The first model tests the simple time slope for high partner avoidance:
+
+```{r}
+coef(summary(dyadGC_di_mod2_High))
+```
+
+and the second model tests the simple time slope for low partner avoidance:
+
+```{r}
+coef(summary(dyadGC_di_mod2_Low))
+```
+
+Looking at the effect of `TIME` in these two models. We see that the change over time is statistically significant when partner's avoidance is high, *p* = .0007, but it is not significant when partner's avoidance is low, *p* = .386.  
+
+We can then use these two models in the `graphMod()` function to make an interaction figure. We will need to note that the intercept is in position **1**, and the slope of interest, `TIME`, is in position **3**.
+
+```{r}
+plot <- graphMod(kashy_ppp, 
+                 kashy_ppp$TIME, 
+                 kashy_ppp$ASATISF, 
+                 kashy_ppp$CPAvoid, 
+                 dyadGC_di_mod2_High, 
+                 dyadGC_di_mod2_Low, 
+                 1, 3) 
+
+plot +
+  geom_point(color = "white") + #to supress dots
+  theme_classic() +
+  ylab("Satisfaction") +
+  xlab("Time (0 is study midpoint)") +
+  scale_color_manual(values = c("tomato", "springgreen"), 
+                     name = "Partner's Avoidance") +
+  ylim(5.5, 6.5)
+```
+
+This looks like a ceiling effect to me. Maybe satisfaction is skewed to the left?
+
+##Model Diagnostics
+
+```{r}
+plot(dyadGC_di_mod2)
+qqnorm(dyadGC_di_mod2$residuals)
+```
+
+It turns out, in this example, satisfaction is skewed to the left.
+
+```{r}
+qplot(x = ASATISF, data = kashy_ppp, bins = 20)
+```
+

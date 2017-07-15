@@ -1,0 +1,293 @@
+---
+title: 'Dyadic Data Analysis'
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
+```
+
+***
+
+Read in the individual data (or a pairwise dataset) 
+
+```{r, error=TRUE}
+library(tidyr)
+library(dplyr)
+library(nlme)
+
+acitelli_ind <- read.csv(file.choose(), header=TRUE)
+```
+
+Convert individual data to pairwise. If you imported a pairwise set, skip this chunk. I also create a gender variable that's a **factor** and has labels `hus` and `wife`. This vairable will be useful later. 
+
+```{r}
+tempA <- acitelli_ind %>% 
+  mutate(genderE = gender, partnum = 1) %>%
+  mutate(gender = ifelse(gender == 1, "A", "P")) %>%
+  gather(variable, value, self_pos:genderE) %>%
+  unite(var_gender, variable, gender) %>%
+  spread(var_gender, value)
+
+tempB <- acitelli_ind %>% 
+  mutate(genderE = gender, partnum = 2) %>%
+  mutate(gender = ifelse(gender == 1, "P", "A")) %>%
+  gather(variable, value, self_pos:genderE)%>%
+  unite(var_gender, variable, gender) %>%
+  spread(var_gender, value)
+
+acitelli_pair <- bind_rows(tempA, tempB) %>%
+  arrange(cuplid) %>%
+  mutate(gender_A = ifelse(genderE_A == 1, "hus", "wife"), gender_A = as.factor(gender_A)) #String, factor
+  
+rm(tempA, tempB)
+```
+
+
+#Indistinguishable Dyads
+
+```{r}
+apim_in <- gls(satisfaction_A ~ other_pos_A + other_pos_P,
+               data = acitelli_pair,
+               correlation = corCompSymm(form=~1|cuplid),
+               na.action = na.omit)
+
+summary(apim_in)
+names(apim_in)
+```
+
+##Effect Sizes
+To compute effect sizes, we use partial correlations.
+
+```{r}
+library(MASS)
+library(ppcor)
+         as.numeric(pcor.test(riggsp$Anxiety_A,riggsp$Sat_A,riggsp$Anxiety_P)[1])
+         as.numeric(pcor.test(riggsp$Anxiety_P,riggsp$Sat_A,riggsp$Anxiety_A)[1])
+```
+
+The effect size for actor is -.311, a moderate effect, and for partner -.228, a small effect. 
+
+##Multiple Correlation
+
+The multiple correlation squared can be computed by comparing the error variance for the model to a model with no predictors.
+
+```{r}
+# Empty Model
+        apimie = summary(gls(Sat_A ~ 1 , 
+                     na.action=na.omit, 
+                     correlation=corCompSymm (form=~1|Dyad),
+                     data=riggsp))
+# sd of errors for the model
+        esd = as.numeric(apimi[6])
+# sd of errors for the empty model
+                esd0 = as.numeric(apimie[6])
+# the R squared, using the crsp function                
+        crsp (esd,esd0)
+```
+
+##Pseudo-R^2^  
+
+How much variance in the response variable does the actor and partner effects explain together? First we run the empty model so that we can get the total variance in the response---which we need to calculate the pseudo-R^2^.
+
+```{r}
+apim_in_empty <- gls(satisfaction_A ~ 1,
+                     data = acitelli_pair,
+                     correlation = corCompSymm(form=~1|cuplid),
+                     na.action = na.omit)
+
+summary(apim_in_empty)
+```
+
+```{r}
+#This will perform a likilihood ratio test for the set of all fixed effects in the model.
+anova(apim_in, apim_in_empty)
+```
+
+```{r}
+#to have R calculate the pseudo-R2.
+pesudo_r2 <- 1-(apim_in$sigma^2/apim_in_empty$sigma^2)
+pesudo_r2
+```
+
+`Rho`: ICC = .618470  
+`Residual SE`^2^ empty model = .246951  
+`Residual SE`^2^ standard model = .174194  
+Pseudo-R^2^ = 1 - (.174194 / .246951) = .295  
+
+Called the "pseudo R2"---29.5% of the variance in satisfaction is explained by other positivity of the actor and the partner. Set it to zero if it's negative.  
+
+##Interpretation of Model Estimates  
+###Fixed Effects  
+**`Intercept`:** Predicted level of satisfaction for those scoring zero on the actor and partner variables.  Because these variables are not centered, it is not all that meaningful.  
+
+**`other_pos_A` or the Actor Variable:** If you see your partner positively, are you satisfied in the relationship? Yes!  
+
+**`other_pos_P` or the Partner effect:** If your partner sees you positively, are you satisfied in the relationship? (Or: If you see your partner positively, is your partner satisfied in the relationship?) Yes!  
+
+###Random Effects
+`Residual SE`^2^ is the error or unexplained variance.  
+The partial ICC, or `Rho`, is .469.  
+
+
+#Distingushable Dyads
+
+##Interaction Approach  
+1. Add distinguishing variable as a covariate.  Note its coding.  
+2. Have the distinguishing variable interact with the actor and the partner effects.  
+3. These interactions evaluate whether actor and partner effects are the same for the two people.  
+4. Add a `weights =` argument to allow for different error variances for the two members.  
+
+
+```{r}
+apim_di_int <- gls(satisfaction_A ~ other_pos_A + other_pos_P + genderE_A 
+                   + other_pos_A*genderE_A + other_pos_P*genderE_A,
+                   data = acitelli_pair,
+                   correlation = corCompSymm(form=~1|cuplid), 
+                   weights = varIdent(form=~1|genderE_A), 
+                   na.action = na.omit)
+
+summary(apim_di_int)
+```
+
+###Interpretation of Effects  
+
+**Intercept** = .650854---The predicted score for husbands and wives who have a 0 on how positively they see the spouse (We should have centered!)  
+**genderE_A**  = .039605---Husband are very slightly more satisfied (about .08 points more) than wives when you control for how they both view their spouse. (Recall wives are -1 on Gender_A and Husbands are +1; the difference between husbands and wives is then twice the difference of the effect of Gender_A.)  
+**other_pos_A** = .401043---Actor Effect: The more positively you view your spouse, the more satisfied you are in the marriage.  
+**other_pos_P** = .291564---Partner Effect:  The more positively your partner views you, the more satisfied you are in the marriage.  
+**genderE_A X other_pos_A** = .023343---The actor effect is stronger for husbands.  
+**genderE_A X other_pos_P** = -.029914---The partner effect is stronger H -> W than W -> H.  
+
+**Actor Effect for Husbands** = .401043 + .023343 = 0.424386  
+**Actor Effect for Wives** = .401043 - .023343  = 0.37770  
+**Partner Effect for W -> H** = .291564 + (-.029914) = 0.261650  
+**Partner Effect for H -> W** = .291564 - (-.029914) = 0.321478  
+
+.207460, error variance for Wives  
+.143139, error variance for Husbands  
+
+Or have R do it like so:
+
+```{r}
+sep_coef <- data.frame(
+  anx_a_men = coef(apim_di_int)[2] + -1*coef(apim_di_int)[5],
+  anx_a_wom = coef(apim_di_int)[2] + 1*coef(apim_di_int)[5],
+  anx_p_men = coef(apim_di_int)[4] + -1*coef(apim_di_int)[6],
+  anx_p_wom = coef(apim_di_int)[4] + 1*coef(apim_di_int)[6],
+  row.names = "Randi's nums")
+
+sep_coef
+```
+
+###Getting Separate Error Variances  
+Notice is the model summary that we now get weights for the error variances. That is, we actually have two separate error variances. We can use the function `getevd` in the `dyadr` package to retrieve them.
+
+```{r}
+error_vars <- data.frame(ev_wom = getevd(apim_di_int)[1], 
+                         ev_men = getevd(apim_di_int)[2])
+
+error_vars
+```
+
+6.83 is the error variance for women, and 6.64 is the error variance for men.
+
+##Two-Intercept Approach  
+This involves a trick by which one equation becomes two.  We create two dummy variables: $H_{ij}$ which equals 1 for husbands and 0 for wives and $W_{ij}$ which equals 1 for wives and zero for husband.  We then estimate the following equation:  
+
+$$Y_{ij} = b_HH_{ij} + a_HH_{ij}A_{ij} + p_HH_{ij}P_{ij} + H_{ij}e_{ij} + b_WW_{ij} + a_WW_{ij}A_{ij} + p_WW_{ij}P_{ij} + W_{ij}e_{ij}$$  
+
+Note that the equation has no ordinary intercept, but rather, in some sense, two intercepts, $b_H$ and $b_W$.  Note that when $H_{ij} = 1$ and $W_{ij} = 0$, the above becomes  
+
+$$Y_{ij} = b_H + a_HA_{ij} + p_HP_{ij} + e_{ij}$$
+
+and when $H_{ij} = 0$ and $W_{ij} = 1$, the above becomes  
+
+$$Y_{ij} = b_W + a_WA_{ij} + p_WP_{ij} + e_{ij}$$
+
+Thus, one equals becomes two and we have actor and partner for both members.  
+
+To implement this in R, we do the following:  
+
+1. Add distinguishing variable as a factor, using `gender_A` created above.
+2. Have no intercept in the fixed model by adding `-1` to the formula.
+3. Have the distinguishing variable (`gender_A`) interact with actor and partner effect, but no actor and partner main effects. We need to use `:` for this instead of `*`. Separate actor and partner effects will be estimated for each member.  
+4. Keep the `weights =` argument to allow for different error variances for the two members.
+
+
+```{r}
+apim_di_two <- gls(satisfaction_A ~ gender_A + other_pos_A:gender_A + other_pos_P:gender_A - 1,
+                   data = acitelli_pair,
+                   correlation = corCompSymm(form=~1|cuplid), 
+                   weights = varIdent(form=~1|genderE_A), 
+                   na.action = na.omit)
+
+summary(apim_di_two)
+```
+
+Notice that these actor and partner estimates are the same as what we calculated above. But now we have p-values for them. So that's cool.
+
+```{r}
+rbind(sep_coef, 
+      model = coef(summary(apim_di_two))[3:6,1],
+      p_values = coef(summary(apim_di_two))[3:6,4])
+```
+
+#R^2^ for Men and Women  
+We could also get R^2^ for men and women separately. 
+
+```{r}
+apim_di_empty <- gls(Sat_A ~ Gender_A,
+                   data = riggsp,
+                   correlation = corCompSymm(form=~1|Dyad),
+                   weights = varIdent(form=~1|Genderstring),
+                   na.action = na.omit)
+
+R_sqs <- data.frame(R_sq_wom = crsp(getevd(apim_di_two)[1], 
+                                    getevd(apim_di_empty)[1]),
+                    R_sq_men = crsp(getevd(apim_di_two)[2], 
+                                    getevd(apim_di_empty)[2]))
+
+R_sqs
+```
+
+Pseudo R^2^ for women is 0.16, or 16% of the variance in satisfaction for women is explained by the model.  
+Pseudo R^2^ for men is 0.14, or 14% of the variance in satisfaction for men is explained by the model.  
+
+
+#Descriptive Statistics by Gender
+There are MANY ways to do this. I use the `dyplr` package.
+
+```{r}
+riggsp %>%
+  select(Genderstring, Anxiety_A, Sat_A) %>% 
+  na.omit() %>% #omits only if missing on the variables included in select()
+  group_by(Genderstring) %>%
+  summarise(Anxiety_A_mean = mean(Anxiety_A),
+            Anxiety_A_sd = sd(Anxiety_A),
+            Sat_A_mean = mean(Sat_A),
+            Sat_A_sd = sd(Sat_A),
+            n = n())
+```
+
+
+#Model Diagnostics  
+We should also check that our assumptions are not violated. 
+
+```{r}
+plot(apim_di_int)
+qqnorm(apim_di_int$residuals)
+```
+
+Looks pretty good to me!
+

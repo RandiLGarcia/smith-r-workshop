@@ -1,0 +1,81 @@
+---
+title: 'Multilevel Modeling'
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+fontsize: 12 pt
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all output
+```
+
+*** 
+
+```{r}
+#install.packages("lme4")
+library(lme4)
+```
+
+We will use the `hox` dataset.
+
+```{r}
+hox <- read.csv(file.choose(), header=TRUE)
+
+glimpse(hox)
+```
+
+Random intercept, no predictors.
+
+```{r}
+mlm <- lmer(popular ~ 1 + (1 | class), data = hox)
+
+summary(mlm)
+```
+
+Level 1 predictor, fixed component only, no random peice. 
+
+```{r}
+mlm_pred1 <- lmer(popular ~ extrav + (1 | class), data = hox)
+
+summary(mlm_pred1)
+```
+
+Level 1 predictor, fixed and random.
+
+```{r}
+mlm_pred1_ran <- lmer(popular ~ extrav + (extrav | class), data = hox)
+
+summary(mlm_pred1_ran)
+```
+
+Level 2 predictor, it can only be fixed. 
+
+```{r}
+mlm_pred2 <- lmer(popular ~ texp + (1 | class), data = hox)
+
+summary(mlm_pred2)
+```
+
+Level 1 and level 2 predictors, the level 1 predictor is random. 
+
+```{r}
+mlm_pred12_ran <- lmer(popular ~ extrav + texp + (extrav | class), data = hox)
+
+summary(mlm_pred12_ran)
+```
+
+Cross-level interaction.
+
+```{r}
+mlm_inter <- lmer(popular ~ extrav*texp + (extrav | class), data = hox)
+
+summary(mlm_inter)
+```
