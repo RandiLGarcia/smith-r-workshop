@@ -23,8 +23,7 @@ fontsize: 12 pt
   + Morning Session 9-12
     - Downloading [R](https://www.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/)
     - [Intro to the RStudio environment, packages, and RMarkdown](Intro_to_R.html)
-    - [Data Manipulation with `dplyr`](Intro_to_dplyr.html)
-    - Descriptive Statistics
+    - [Data Manipulation and descriptive statistics with `dplyr`](Intro_to_dplyr.html)
   + Lunch 12:00 PM to 1:15 PM 
   + Afternoon Session 1:15-3:30
     - [Making Figures with `ggplot2`](Intro_to_ggplot2.html)
@@ -46,8 +45,7 @@ fontsize: 12 pt
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
     - [Exploratory Factor Analysis (EFA)](Exploratory_Factor_Analysis.html)
-    - [Confirmatory Factor Analysis (CFA) with `laavan`](Confirmatory_Factor_Analysis_and_SEM.html)
-    - Intro to SEM
+    - [Confirmatory Factor Analysis (CFA) and SEM with `laavan`](Confirmatory_Factor_Analysis_and_SEM.html)
   + Resources for more practice
     - [Factor Analysis with `psych`](factor.pdf)
     - [`lavaan` tutorials](http://lavaan.ugent.be/tutorial/)
