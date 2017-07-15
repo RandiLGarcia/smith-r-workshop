@@ -7,8 +7,11 @@ output:
     highlight: pygments
     theme: cerulean
     toc: yes
-    toc_float: yes
     toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 fontsize: 12 pt
 ---
 
@@ -56,11 +59,11 @@ fontsize: 12 pt
 
   + Morning Session 9-12
     - [Multilevel Modeling with `lme4`](Multilevel_Modeling.html)
-    - [Generalized Linear Mixed Models](Generalized_Linear_Mixed_Models.html)
-  + Lunch 12:00 PM to 1:15 PM  
-  + Afternoon Session 1:15-3:30
     - [Data Manipulation with `tidyr`](Data_manipulation_with_tidyr.html)
     - [Dyadic Data Analysis with `nlme` and `dyadr`](Dyadic_Data_Analysis.html)
+  + Lunch 12:00 PM to 1:15 PM  
+  + Afternoon Session 1:15-3:30
+    - [Generalized Linear Mixed Models](Generalized_Linear_Mixed_Models.html)
     - [Individual and Dyadic Growth Curve Modeling](Growth_Curve_Modeling.html)
   + Resources for more practice
     - [`tidyr` lab 4](https://beanumber.github.io/sds192/lab-tidy.html)

@@ -1,15 +1,15 @@
 ---
-title: 'Generalized Linear Mixed Models'
+title: "Generalized Linear Mixed Models"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
   html_document:
     highlight: pygments
     theme: cerulean
     toc: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: 3
 fontsize: 12 pt
 ---
 ```{r setup, include=FALSE}
@@ -63,60 +63,6 @@ acitelli_pair <- bind_rows(tempA, tempB) %>%
   
 rm(tempA, tempB)
 ```
-
-#Logistic Regression and Poisson Regression
-
-First, let's only select the women so we can do away with the nesting. 
-
-```{r}
-acitelli_women <- acitelli_pair %>%
-  filter(genderE_A == -1)
-```
-
-##Logistic Regression
-
-Then we run a ordinary logistic regression. 
-
-```{r}
-logistic_reg <- glm(simhob_bin_A ~ other_pos_A + other_pos_P,
-                    data = acitelli_women,
-                    family = binomial)
-
-summary(logistic_reg)
-```
-
-This gives us the increase in log odds of a woman having the same hobbies as her husband for every 1 unit increase in other positivity of the actor and partner other positivity.  
-
-If we want to easily switch estimates from "log odds" to "odds," we use the following:
-
-```{r}
-exp(logistic_reg$coefficients)
-```
-
-##Poisson Regression (aka, Log-Linear Regression)
-
-First, we run the model assuming the variance equals the mean. 
-
-```{r}
-poisson_reg <- glm(cigarettes_A ~ other_pos_A + other_pos_P,
-                   data = acitelli_women,
-                   family = poisson)
-
-summary(poisson_reg)
-exp(poisson_reg$coefficients)
-```
-
-But, we can also run a model relaxing the variance = mean assumption. That is, we can include an over-dispersion parameter with `family = quasipoisson`. 
-
-```{r}
-poissonOD_reg <- glm(cigarettes_A ~ other_pos_A + other_pos_P,
-                     data = acitelli_women,
-                     family = quasipoisson)
-
-summary(poissonOD_reg)
-exp(poissonOD_reg$coefficients)
-```
-
 
 #Logistic Multilevel Modeling (Binary variables)
 

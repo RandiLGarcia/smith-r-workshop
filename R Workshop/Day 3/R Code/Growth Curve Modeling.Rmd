@@ -41,7 +41,7 @@ library(dplyr)
 library(nlme)
 library(ggplot2)
 
-kashy_ppp <- read.csv(file.choose(), header=TRUE)
+kashy_ppp <- read.csv("/Users/randigarcia/Dropbox/Smith-Service/Three-day-workshop/R Workshop/Data/kashy.csv", header=TRUE)
 ```
 
 ```{r, eval=FALSE}

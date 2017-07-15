@@ -1,5 +1,5 @@
 ---
-title: 'Data Manipulation with tidyr'
+title: "Data Manipulation with tidyr"
 output:
   html_document:
     highlight: pygments
@@ -48,7 +48,6 @@ acitelli_dyd <- acitelli_ind %>%
 
 head(acitelli_dyd)
 ```
-
 
 
 ##Individual to Pairwise Structure
