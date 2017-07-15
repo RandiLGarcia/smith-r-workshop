@@ -57,7 +57,7 @@ fontsize: 12 pt
 ##[Day 3: Multilevel Modeling in R](Day 3 Slides.pdf)
 
   + Morning Session 9-12
-    - [Two-level Linear Models with `lme4`](Multilevel_Modeling.html)
+    - [Multilevel Modeling with `lme4`](Multilevel_Modeling.html)
     - [Generalized Linear Mixed Models](Generalized_Linear_Mixed_Models.html)
   + Lunch 12:00 PM to 1:15 PM  
   + Afternoon Session 1:15-3:30
