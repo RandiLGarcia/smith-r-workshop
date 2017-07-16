@@ -1,5 +1,5 @@
 ---
-title: 'Multilevel Modeling'
+title: "Multilevel Modeling"
 output:
   html_document:
     highlight: pygments
@@ -20,11 +20,17 @@ knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all outpu
 *** 
 
 ```{r}
+library(mosaic)
+library(dplyr)
+library(ggplot2)
+
 #install.packages("lme4")
 library(lme4)
 ```
 
-We will use the `hox` dataset.
+#Load the Hox Data
+
+We will use the `hox` dataset that has the example from the slides. Each pupil has a popularity rating, `popular`, and extroversion rating, `extrav`, their gender, `sex`, the class room their in, `class`, and their teachers' years of experience, `texp`. We will be exploring popularity as a function of extroversion, sex, and teacher's experience. 
 
 ```{r}
 hox <- read.csv(file.choose(), header=TRUE)
@@ -32,7 +38,23 @@ hox <- read.csv(file.choose(), header=TRUE)
 glimpse(hox)
 ```
 
-Random intercept, no predictors.
+#Exploratory Data Analysis
+
+Do some preliminary data analysis to get familiar with the data set. 
+
+  - What are the descriptives for `popular`? 
+  - Make some visualizations. How about sex? 
+  - How many classrooms do we have (hint: the `distinct()` function might help)? 
+  - What are the gender percentages by classroom? 
+  - Which classrooms have the top 5 most popular teachers (variable 'popteach`)?
+
+```{r}
+#Exploratory data analysis
+```
+
+#Random Intercept, No Predictors
+
+First let's fit the most basic multilevel model, the random intercept model with no predictors.
 
 ```{r}
 mlm <- lmer(popular ~ 1 + (1 | class), data = hox)
@@ -40,7 +62,30 @@ mlm <- lmer(popular ~ 1 + (1 | class), data = hox)
 summary(mlm)
 ```
 
-Level 1 predictor, fixed component only, no random peice. 
+Note that model objects have handy properties:
+
+```{r}
+names(summary(mlm))
+
+#which do you think will confirm your number of groups from above?
+```
+
+##Intraclass Correlation (ICC)
+
+The intraclass correlation (ICC) can be computed as:
+
+```{r}
+ran_eff <- as.data.frame(summary(mlm)$varcor) %>% 
+  select(-var1, -var2)
+
+icc <- ran_eff[1,2]/(ran_eff[1,2] + ran_eff[2,2])
+
+icc
+```
+
+#Level 1 Predictor, Fixed 
+
+Does the pupil's extroversion predict their popularity? Now, let's add 1 level 1 predictor, the pupil's extroversion score. We'll ass the fixed component only, not the random piece. 
 
 ```{r}
 mlm_pred1 <- lmer(popular ~ extrav + (1 | class), data = hox)
@@ -48,7 +93,30 @@ mlm_pred1 <- lmer(popular ~ extrav + (1 | class), data = hox)
 summary(mlm_pred1)
 ```
 
-Level 1 predictor, fixed and random.
+#Level 1 predictor, Random
+
+##Spaghetti Plot
+
+Spaghetti plot shows effects for different classrooms.
+
+```{r}
+hox_small <- hox %>%
+  filter(class >= 1 & class <= 6)
+
+ggplot(hox_small, aes(extrav, popular, 
+                            group = as.factor(class),
+                            color = as.factor(class))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Try faceting by class instead. 
+
+```{r}
+#Alt spaghetti plot
+```
+
+For every 1 unit increase in extroversion we'd expect a 0.49 point increase in popularity. Does this size of this popularity effect differ across classrooms? Let's ass the random component of the extroversion effect.
 
 ```{r}
 mlm_pred1_ran <- lmer(popular ~ extrav + (extrav | class), data = hox)
@@ -56,7 +124,11 @@ mlm_pred1_ran <- lmer(popular ~ extrav + (extrav | class), data = hox)
 summary(mlm_pred1_ran)
 ```
 
-Level 2 predictor, it can only be fixed. 
+The standard deviation of the extroversion effect is 0.16. There is a negative correlation between the classroom's intercept and the effect of extroversion.  
+
+#Level 2 predictor
+
+Does the teacher's experience have an effect on the pupil's popularity? Let's ass this level 2 predictor, it can only be fixed. 
 
 ```{r}
 mlm_pred2 <- lmer(popular ~ texp + (1 | class), data = hox)
@@ -64,7 +136,7 @@ mlm_pred2 <- lmer(popular ~ texp + (1 | class), data = hox)
 summary(mlm_pred2)
 ```
 
-Level 1 and level 2 predictors, the level 1 predictor is random. 
+Yes, more experienced teachers seem to have more popular pupils. Next we we can have level 1 and level 2 predictors, the level 1 predictor is random. 
 
 ```{r}
 mlm_pred12_ran <- lmer(popular ~ extrav + texp + (extrav | class), data = hox)
@@ -72,10 +144,26 @@ mlm_pred12_ran <- lmer(popular ~ extrav + texp + (extrav | class), data = hox)
 summary(mlm_pred12_ran)
 ```
 
-Cross-level interaction.
+#Cross-Level Interaction
+
+Is the effect of extroversion stronger in classrooms with more experienced teachers? Finally, we can estimate the cross-level interaction of extroversion and teacher's experience. 
 
 ```{r}
 mlm_inter <- lmer(popular ~ extrav*texp + (extrav | class), data = hox)
 
 summary(mlm_inter)
 ```
+
+See if you can make a graph to get a sense of this interaction. Hint: first create a variable that is the median split of `texp`.
+
+```{r}
+#graph the interaction
+```
+
+Check the residuals.
+
+```{r}
+#model diagnostics here.
+```
+
+

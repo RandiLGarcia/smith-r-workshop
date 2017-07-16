@@ -20,7 +20,7 @@ knitr::opts_chunk$set(warning = FALSE) #to supress warning messages in all outpu
 ***
 
 ```{r}
-acitelli <- read.csv("/Users/randigarcia/Desktop/acitelli.csv", header=TRUE)
+acitelli <- read.csv(file.choose(), header=TRUE)
 ```
 
 We first want to create a gender variable that is a character, this will make the output look nicer. We'll make use of the `ifelse()` function inside of `mutate()`.

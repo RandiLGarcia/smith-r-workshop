@@ -36,7 +36,7 @@ library(semPlot)
 
 #Confirmatory Factor Analysis
 
-Now, instead of taking a shot in the dark about the factor structue, we are going in with a clear idea about which items we things load on which factors. Our goal is to test how well our model of the factor structure actually fits the data. 
+Now, instead of taking a shot in the dark about the factor structure, we are going in with a clear idea about which items we things load on which factors. Our goal is to test how well our model of the factor structure actually fits the data. 
 
 First we specify the model.
 
@@ -50,7 +50,7 @@ bf_model <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
 
 ##Diagram
 
-Plot the model to make sure it is what you want. Here we are using the `semPaths()` and `semPlotModel()` from the `semPlot` package. The `rotation = 2` option forces the exogenous vairables to be on the left side. 
+Plot the model to make sure it is what you want. Here we are using the `semPaths()` and `semPlotModel()` from the `semPlot` package. The `rotation = 2` option forces the exogenous variables to be on the left side. 
 
 ```{r}
 semPaths(semPlotModel(bf_model), rotation = 2)
@@ -69,7 +69,7 @@ inspect(bf_fit, what = "std") #for standardized estimates
 
 ##Modification Indicies
 
-Because our model is not a great fit to our data, we migth want to ask for the *modification indicies* with the `modindices()` function. `lavaan` will give you a set of changes you can make that will increase the fit on the model. The `mi` value is the amount a reduction in the chi-square statistics that each change would bring---so the higher the better because a reduction in chi-square means and increase in fit! 
+Because our model is not a great fit to our data, we might want to ask for the *modification indicies* with the `modindices()` function. `lavaan` will give you a set of changes you can make that will increase the fit on the model. The `mi` value is the amount a reduction in the chi-square statistics that each change would bring---so the higher the better because a reduction in chi-square means and increase in fit! 
 
 ```{r}
 modindices(bf_fit) %>% 
@@ -80,7 +80,7 @@ modindices(bf_fit) %>%
 
 ##Re-specifying the Model
 
-Maybe we want to add error covariances based on modificaton indicies. I recommend only doing this if it makes theoretical sense. Also, what ever theoretical rule you use to justify making these error correlations, if it applies to other sets of items, then add the correlations there too. Be consistent! **If you just make changes based on the modification indicies without thinking carefully about the theory behind them, then you are doing exploratory factor analysis.**   
+Maybe we want to add error covariances based on modification indices. I recommend only doing this if it makes theoretical sense. Also, what ever theoretical rule you use to justify making these error correlations, if it applies to other sets of items, then add the correlations there too. Be consistent! **If you just make changes based on the modification indicies without thinking carefully about the theory behind them, then you are doing exploratory factor analysis.**   
 
 ```{r}
 bf_model_re1 <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
@@ -131,7 +131,7 @@ summary(bf_fit_re2, fit.measures = TRUE, rsq=TRUE)
 inspect(bf_fit_re2, what = "std")
 ```
 
-It is still not a great fit to the data, but I don't think I'd want to amke any of these modifications. 
+It is still not a great fit to the data, but I don't think I'd want to make any of these modifications. 
 
 ```{r}
 modindices(bf_fit_re2) %>% 
@@ -140,7 +140,7 @@ modindices(bf_fit_re2) %>%
   head(10)
 ```
 
-We can compare teh CFIs for the 3 models with the `fitmeasures()` function. 
+We can compare the CFIs for the 3 models with the `fitmeasures()` function. 
 
 ```{r}
 fitmeasures(bf_fit)[9]

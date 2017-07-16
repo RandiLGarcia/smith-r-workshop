@@ -259,8 +259,8 @@ div.tocify {
 <span class="kw">library</span>(nlme)
 <span class="kw">library</span>(dplyr)
 
-acitelli_ind &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/randigarcia/Dropbox/Smith-Service/Three-day-workshop/R Workshop/Data/acitelli.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</code></pre></div>
-<p>Convert individual data to pairwise. If you imported a pairwise set, skip this chunk. I also create a gender variable that’s a <strong>factor</strong> and has labels <code>hus</code> and <code>wife</code>. This vairable will be useful later.</p>
+acitelli_ind &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/randigarcia/Desktop/Data/acitelli.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p>Convert individual data to pairwise. If you imported a pairwise set, skip this chunk. I also create a gender variable that’s a <strong>factor</strong> and has labels <code>hus</code> and <code>wife</code>. This variable will be useful later.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tempA &lt;-<span class="st"> </span>acitelli_ind %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">genderE =</span> gender, <span class="dt">partnum =</span> <span class="dv">1</span>) %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gender =</span> <span class="kw">ifelse</span>(gender ==<span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;P&quot;</span>)) %&gt;%

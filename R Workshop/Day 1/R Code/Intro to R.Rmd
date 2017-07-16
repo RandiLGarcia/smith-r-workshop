@@ -121,7 +121,7 @@ library(mosaic)
 
 #Basic Descriptive Statistics with `mosaic`
 
-The function `favstats()` will give descriptive statistics for a numerical vairable, and the function `tally()` will give you frequencies for a categorical variable (or a numberical variable...if you want it). Functions in `mosaic` use the formula syntax, where `y ~ x`, or for a single variable, `~x`. The `~` key can be found just below your `esc` key. The first argument is the formula, and the second argument is the data frame, e.g., `data = acitelli`.
+The function `favstats()` will give descriptive statistics for a numerical variable, and the function `tally()` will give you frequencies for a categorical variable (or a numerical variable...if you want it). Functions in `mosaic` use the formula syntax, where `y ~ x`, or for a single variable, `~x`. The `~` key can be found just below your `esc` key. The first argument is the formula, and the second argument is the data frame, e.g., `data = acitelli`.
 
 ```{r}
 favstats(~satisfaction, data = acitelli)
@@ -150,7 +150,7 @@ What is(are) the mode(s) of the `self_pos` variable?
 
 ```
 
-The `mosaic` package also has a function for getting the correlation coefficent, it's called `cor()`. Using the same format (i.e., formula then data), how would you get the correlation of satisfaction and tension?
+The `mosaic` package also has a function for getting the correlation coefficient, it's called `cor()`. Using the same format (i.e., formula then data), how would you get the correlation of satisfaction and tension?
 
 ```{r}
 

@@ -28,7 +28,7 @@ library(psych)
 
 #ANOVA
 
-We are going to be using the Big Five Inventory dataset, `bfi`, to demonsrate ANOVA. This dataset it contained in the `psych` package. 
+We are going to be using the Big Five Inventory dataset, `bfi`, to demonstrate ANOVA. This dataset it contained in the `psych` package. 
 
 ```{r}
 data(bfi)
@@ -89,7 +89,7 @@ A better thing to do would be to check for differences with a one-way anova.
 
 ##One-Way ANOVA
 
-Perform a one-way ANOVA for education level on concientousness. Let's first look at the distributions of conscientiousness by education level. Note that first we're changing the education variable's type from integer to factor with the `as.factor()` function and giving nice labels to the factor levels.
+Perform a one-way ANOVA for education level on conscientiousness. Let's first look at the distributions of conscientiousness by education level. Note that first we're changing the education variable's type from integer to factor with the `as.factor()` function and giving nice labels to the factor levels.
 
 ```{r}
 bfi <- bfi %>%
@@ -197,7 +197,7 @@ mod2 <- aov(conscient ~ education*gender, data = bfi)
 summary(mod2)
 ```
 
-There is a statistically signficant main effect of gender, *F*(1, 2480) = 17.14, *p* < .001, such that, women (*M* = 4.36, *SD* = 0.93) are more conscientious than men (*M* = 4.18, *SD* = 0.96). These main effects are qualified by a statistically significant two-way interaction of eduation and gender, *F*(4, 2480) = 2.56, *p* = .037. Let's make a bar graph!
+There is a statistically significant main effect of gender, *F*(1, 2480) = 17.14, *p* < .001, such that, women (*M* = 4.36, *SD* = 0.93) are more conscientious than men (*M* = 4.18, *SD* = 0.96). These main effects are qualified by a statistically significant two-way interaction of education and gender, *F*(4, 2480) = 2.56, *p* = .037. Let's make a bar graph!
 
 ```{r}
 plotdata <- bfi %>% 
@@ -249,7 +249,7 @@ sat.act %>%
   t.test(SATV, SATQ, data = ., paired = TRUE)
 ```
 
-We can test if these two patterns are statistically different from each other with a gender (**between-subjects**) by topic (**within-subjects**) two-way mixed effectcs ANOVA. Where topic has two levels: 1) Verbal and 2) quantitative. We have to restructure our data first.
+We can test if these two patterns are statistically different from each other with a gender (**between-subjects**) by topic (**within-subjects**) two-way mixed effects ANOVA. Where topic has two levels: 1) Verbal and 2) quantitative. We have to restructure our data first.
 
 ```{r}
 n <- nrow(sat.act)
@@ -299,7 +299,7 @@ It looks as though there are only gender differences on the SATQ, but not the SA
 
 #Regression
 
-Back to the `bfi` dataset. What if we wanted to treat `education` like an interval measured variable instead of ordinal? We could then regress concientiousness on education in a simple linear regression model. First, let's clear our environment and re-load the data. 
+Back to the `bfi` dataset. What if we wanted to treat `education` like an interval measured variable instead of ordinal? We could then regress conscientiousness on education in a simple linear regression model. First, let's clear our environment and re-load the data. 
 
 ```{r}
 data(bfi)
@@ -310,7 +310,7 @@ bfi <- bfi %>%
          conscient = (C1 + C2 + C3 + C4.r + C5.r)/5)
 ```
 
-It's good practice to make a scatterplot before running a regression. Do this using `ggplot2`. You might want to try using `geom_jitter()`. Also, add a linear regression line using `geom_smooth(method = "lm")`. 
+It's good practice to make a scatter plot before running a regression. Do this using `ggplot2`. You might want to try using `geom_jitter()`. Also, add a linear regression line using `geom_smooth(method = "lm")`. 
 
 ```{r}
 #make a scatter plot here. 
@@ -354,7 +354,7 @@ Try making a figure that splits the slope of education on conscientiousness by g
 
 ##Logistic Regression
 
-Because personality is relatively stable, we may instead ask are people who are more concientious more likely to graduate from college? This would be a logistic regression model. We can use the code we wrote yesterday for creating the dichotomous variable 1 = yes college, 0 = no college. 
+Because personality is relatively stable, we may instead ask are people who are more conscientious more likely to graduate from college? This would be a logistic regression model. We can use the code we wrote yesterday for creating the dichotomous variable 1 = yes college, 0 = no college. 
 
 ```{r}
 bfi <- bfi %>%
@@ -376,7 +376,7 @@ It's handy to look at the exponentiated estimates using the `exp()` function.
 exp(coef(mod6))
 ```
 
-You are 0.92 times as likely to go graduate from college for every 1 unit increase in conscienciousness, but this is only mariginally significant, *p* = .073. 
+You are 0.92 times as likely to go graduate from college for every 1 unit increase in conscientiousness, but this is only marginally significant, *p* = .073. 
 
 
 

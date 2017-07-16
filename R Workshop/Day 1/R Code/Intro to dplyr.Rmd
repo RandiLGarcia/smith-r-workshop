@@ -25,7 +25,7 @@ acitelli <- read.csv(file.choose(), header=TRUE)
 
 #Data Manipulation (data cleaning)
 
-We'll use the package `dplyr`. The `dplyr` package contains the functions for all of the data cleaning varbs: `filter()`, `mutate()`, `rename()`, `arrange()`, `select()`, `summarize()`, and `group_by()`. You can find a cheat sheet for `dplyr` [here](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf).
+We'll use the package `dplyr`. The `dplyr` package contains the functions for all of the data cleaning verbs: `filter()`, `mutate()`, `rename()`, `arrange()`, `select()`, `summarize()`, and `group_by()`. You can find a cheat sheet for `dplyr` [here](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf).
 
 ```{r, message=FALSE, warning=FALSE}
 #install.packages("dplyr")
@@ -47,11 +47,11 @@ menOnly <- acitelli %>%
   filter(gender ==1)
 ```
 
-We can save this new data set in our files as a csv. Note that the file path conventions are differnt for Windows machines. If copying and pasting from properties, you will need to change backslashes to forward slashes. 
+We can save this new data set in our files as a csv. Note that the file path conventions are different for Windows machines. If copying and pasting from properties, you will need to change backslashes to forward slashes. 
 
 ```{r}
 write.csv(menOnly, 
-  file = "/Users/randigarcia/Desktop/Three-day-workshop/R Workshop/Data/men.csv")
+  file = "/Users/randigarcia/Desktop/Data/men.csv") #replace file path
 ```
 
 It's in your working directory, which you can find with the following command. It is an empty function, so it looks weird.
@@ -89,16 +89,16 @@ menOnly <- menOnly %>%
   mutate(mature_hus = Yearsmar > median(Yearsmar))
 ```
 
-How would you get the frequncies on this vairable?
+How would you get the frequencies on this variable?
 
 ```{r}
-
+#frequencies
 ```
 
 Now for a sanity check, how would you get the descriptive stats split by mature and non-mature husbands?
 
 ```{r}
-
+#descriptives split
 ```
 
 ##Renaming variable with `rename()`
@@ -212,7 +212,7 @@ acitelli <- acitelli %>%
 
 ##Pipelines
 
-We now seen our first piplines, using `group_by()`. Now we can make a pipeline of many of the commands I did above. The last thing I do is drop useless `gender` variable, because the resulting dataset if all men.
+We now seen our first pipelines, using `group_by()`. Now we can make a pipeline of many of the commands I did above. The last thing I do is drop useless `gender` variable, because the resulting dataset if all men.
 
 ```{r}
 mature_hus2 <- acitelli %>%
@@ -228,13 +228,13 @@ mature_hus2 <- acitelli %>%
 Save a dataset of women who are perceiving above the mean tension, and drop the `simhob` variable.
 
 ```{r}
-
+#above the mean
 ```
 
 What are the couple ID's of the couples with the lowest 3 average satisfaction scores?
 
 ```{r}
-
+#3 lowest
 ```
 
 

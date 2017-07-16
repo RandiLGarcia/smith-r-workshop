@@ -1,15 +1,15 @@
 ---
 title: "Generalized Linear Mixed Models"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: 3
   html_document:
     highlight: pygments
     theme: cerulean
     toc: yes
     toc_depth: 3
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
 fontsize: 12 pt
 ---
 ```{r setup, include=FALSE}
@@ -66,7 +66,7 @@ rm(tempA, tempB)
 
 #Logistic Multilevel Modeling (Binary variables)
 
-To account for the nonindependence, we can make use of the `glmer()` function from the `lme4` package. Note that we are asking for the variance of intercepts across dyads, that is the random intercept in traditonal multilevel modeling. The `gls()` function in the `nlme` package does not have an option for specifying a link function (i.e., there is no `family =` option). The syntax of `glmer()` differs a bit from `gls()` in that the random effects are specified within the formula: `+ (1/cuplid)`.
+To account for the nonindependence, we can make use of the `glmer()` function from the `lme4` package. Note that we are asking for the variance of intercepts across dyads, that is the random intercept in traditional multilevel modeling. The `gls()` function in the `nlme` package does not have an option for specifying a link function (i.e., there is no `family =` option). The syntax of `glmer()` differs a bit from `gls()` in that the random effects are specified within the formula: `+ (1/cuplid)`.
 
 ##Indistinguishable Dyads
 

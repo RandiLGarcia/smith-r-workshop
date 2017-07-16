@@ -254,7 +254,7 @@ div.tocify {
 <span class="co">#install.packages(&quot;lme4&quot;)</span>
 <span class="kw">library</span>(lme4)
 
-acitelli_ind &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/randigarcia/Desktop/Three-day-workshop/R Workshop/Data/acitelli.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</code></pre></div>
+acitelli_ind &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/randigarcia/Desktop/Data/acitelli.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p>Convert individual data to pairwise. I also create a simhobs variable that will be our binary response, two dummy variables that will be useful for estimating separate random intercepts for men and women, and a count variable <code>cigarettes</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tempA &lt;-<span class="st"> </span>acitelli_ind %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">genderE =</span> gender, <span class="dt">partnum =</span> <span class="dv">1</span>) %&gt;%
@@ -286,7 +286,7 @@ acitelli_pair &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(te
 <span class="kw">rm</span>(tempA, tempB)</code></pre></div>
 <div id="logistic-multilevel-modeling-binary-variables" class="section level1">
 <h1>Logistic Multilevel Modeling (Binary variables)</h1>
-<p>To account for the nonindependence, we can make use of the <code>glmer()</code> function from the <code>lme4</code> package. Note that we are asking for the variance of intercepts across dyads, that is the random intercept in traditonal multilevel modeling. The <code>gls()</code> function in the <code>nlme</code> package does not have an option for specifying a link function (i.e., there is no <code>family =</code> option). The syntax of <code>glmer()</code> differs a bit from <code>gls()</code> in that the random effects are specified within the formula: <code>+ (1/cuplid)</code>.</p>
+<p>To account for the nonindependence, we can make use of the <code>glmer()</code> function from the <code>lme4</code> package. Note that we are asking for the variance of intercepts across dyads, that is the random intercept in traditional multilevel modeling. The <code>gls()</code> function in the <code>nlme</code> package does not have an option for specifying a link function (i.e., there is no <code>family =</code> option). The syntax of <code>glmer()</code> differs a bit from <code>gls()</code> in that the random effects are specified within the formula: <code>+ (1/cuplid)</code>.</p>
 <div id="indistinguishable-dyads" class="section level2">
 <h2>Indistinguishable Dyads</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">apim_bin &lt;-<span class="st"> </span><span class="kw">glmer</span>(simhob_bin_A ~<span class="st"> </span>other_pos_A +<span class="st"> </span>other_pos_P 
@@ -461,29 +461,27 @@ apim_bin_di_two &lt;-<span class="st"> </span><span class="kw">glmer</span>(simh
 ##    Data: acitelli_pair
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    854.0    868.8   -423.0    846.0      292 
+##    859.4    874.2   -425.7    851.4      292 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -1.1642 -0.9800 -0.1539  0.5813  2.3382 
+## -1.1350 -0.9103 -0.1137  0.5536  2.0678 
 ## 
 ## Random effects:
 ##  Groups Name        Variance Std.Dev.
-##  cuplid (Intercept) 0.1005   0.3169  
+##  cuplid (Intercept) 0.1896   0.4354  
 ## Number of obs: 296, groups:  cuplid, 148
 ## 
 ## Fixed effects:
 ##             Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)  0.34870    0.63333   0.551    0.582
-## other_pos_A  0.02479    0.11118   0.223    0.824
-## other_pos_P -0.05673    0.11020  -0.515    0.607
+## (Intercept)  0.52660    0.68552   0.768    0.442
+## other_pos_A -0.04827    0.11476  -0.421    0.674
+## other_pos_P -0.03210    0.11493  -0.279    0.780
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) oth__A
-## other_pos_A -0.669       
-## other_pos_P -0.659 -0.109
-## convergence code: 0
-## Model failed to converge with max|grad| = 0.00204661 (tol = 0.001, component 1)</code></pre>
+## other_pos_A -0.695       
+## other_pos_P -0.697 -0.022</code></pre>
 </div>
 <div id="distinguishable-dyads-1" class="section level2">
 <h2>Distinguishable Dyads</h2>
@@ -505,38 +503,36 @@ apim_bin_di_two &lt;-<span class="st"> </span><span class="kw">glmer</span>(simh
 ##    Data: acitelli_pair
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    861.9    895.1   -421.9    843.9      287 
+##    867.2    900.4   -424.6    849.2      287 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -1.1917 -0.9238 -0.1386  0.5645  2.4580 
+## -1.1476 -0.8573 -0.0747  0.5109  2.0546 
 ## 
 ## Random effects:
 ##  Groups Name  Variance Std.Dev. Corr
-##  cuplid man   0.08229  0.2869       
-##         woman 0.10641  0.3262   1.00
+##  cuplid man   0.2391   0.4890       
+##         woman 0.1516   0.3894   1.00
 ## Number of obs: 296, groups:  cuplid, 148
 ## 
 ## Fixed effects:
-##                        Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)            0.248825   0.002710   91.82   &lt;2e-16 ***
-## other_pos_A            0.039959   0.002601   15.37   &lt;2e-16 ***
-## other_pos_P           -0.049611   0.002601  -19.07   &lt;2e-16 ***
-## genderE_A             -0.260913   0.002623  -99.45   &lt;2e-16 ***
-## other_pos_A:genderE_A  0.158261   0.002571   61.55   &lt;2e-16 ***
-## other_pos_P:genderE_A -0.094623   0.002651  -35.69   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+##                       Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)            0.55936    0.69255   0.808    0.419
+## other_pos_A           -0.04907    0.11664  -0.421    0.674
+## other_pos_P           -0.03971    0.11568  -0.343    0.731
+## genderE_A             -0.10278    0.55610  -0.185    0.853
+## other_pos_A:genderE_A -0.05344    0.12225  -0.437    0.662
+## other_pos_P:genderE_A  0.05875    0.12129   0.484    0.628
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) oth__A oth__P gndE_A o__A:E
-## other_pos_A -0.008                            
-## other_pos_P -0.007 -0.028                     
-## genderE_A   -0.003 -0.001 -0.001              
-## othr__A:E_A -0.013 -0.003 -0.003 -0.010       
-## othr__P:E_A  0.243 -0.005 -0.004 -0.011 -0.046
+## other_pos_A -0.698                            
+## other_pos_P -0.691 -0.025                     
+## genderE_A    0.102 -0.134 -0.006              
+## othr__A:E_A -0.134  0.186 -0.004 -0.537       
+## othr__P:E_A  0.026 -0.044  0.013 -0.527 -0.428
 ## convergence code: 0
-## Model failed to converge with max|grad| = 0.0271507 (tol = 0.001, component 1)</code></pre>
+## Model failed to converge with max|grad| = 0.0114521 (tol = 0.001, component 1)</code></pre>
 <p>Two-intercept model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">apim_poi_di_two &lt;-<span class="st"> </span><span class="kw">glmer</span>(cigarettes_A ~<span class="st"> </span>gender_A +<span class="st"> </span>other_pos_A:gender_A +<span class="st"> </span>other_pos_P:gender_A -<span class="st"> </span><span class="dv">1</span>
                          +<span class="st"> </span>(man +<span class="st"> </span>woman -<span class="st"> </span><span class="dv">1</span>|cuplid),
@@ -554,39 +550,36 @@ apim_bin_di_two &lt;-<span class="st"> </span><span class="kw">glmer</span>(simh
 ##    Data: acitelli_pair
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    861.9    895.1   -421.9    843.9      287 
+##    867.2    900.4   -424.6    849.2      287 
 ## 
 ## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -1.1916 -0.9237 -0.1388  0.5646  2.4574 
+##      Min       1Q   Median       3Q      Max 
+## -1.14761 -0.85705 -0.07483  0.51097  2.05495 
 ## 
 ## Random effects:
 ##  Groups Name  Variance Std.Dev. Corr
-##  cuplid man   0.08233  0.2869       
-##         woman 0.10643  0.3262   1.00
+##  cuplid man   0.2392   0.4891       
+##         woman 0.1515   0.3893   1.00
 ## Number of obs: 296, groups:  cuplid, 148
 ## 
 ## Fixed effects:
-##                           Estimate Std. Error z value Pr(&gt;|z|)    
-## gender_Ahus              -0.012414   0.004250   -2.92  0.00349 ** 
-## gender_Awife              0.511040   0.004250  120.25  &lt; 2e-16 ***
-## gender_Ahus:other_pos_A   0.198315   0.002700   73.46  &lt; 2e-16 ***
-## gender_Awife:other_pos_A -0.118388   0.002706  -43.75  &lt; 2e-16 ***
-## gender_Ahus:other_pos_P  -0.144273   0.002701  -53.42  &lt; 2e-16 ***
-## gender_Awife:other_pos_P  0.044801   0.002706   16.56  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+##                           Estimate Std. Error z value Pr(&gt;|z|)
+## gender_Ahus               0.461750   0.931182   0.496    0.620
+## gender_Awife              0.661191   0.842984   0.784    0.433
+## gender_Ahus:other_pos_A  -0.102970   0.183986  -0.560    0.576
+## gender_Awife:other_pos_A  0.004639   0.152482   0.030    0.976
+## gender_Ahus:other_pos_P   0.018262   0.168677   0.108    0.914
+## gender_Awife:other_pos_P -0.098512   0.166535  -0.592    0.554
 ## 
 ## Correlation of Fixed Effects:
 ##             gndr_Ah gndr_Aw gndr_Ah:__A gndr_Aw:__A gndr_Ah:__P
-## gender_Awif  0.492                                             
-## gndr_Ah:__A -0.008  -0.004                                     
-## gndr_Aw:__A -0.005  -0.008   0.004                             
-## gndr_Ah:__P -0.008  -0.004  -0.264       0.004                 
-## gndr_Aw:__P -0.005  -0.008   0.004      -0.263       0.004     
+## gender_Awif  0.217                                             
+## gndr_Ah:__A -0.659  -0.145                                     
+## gndr_Aw:__A -0.122  -0.567  -0.048                             
+## gndr_Ah:__P -0.567  -0.121  -0.237       0.211                 
+## gndr_Aw:__P -0.145  -0.660   0.215      -0.236      -0.047     
 ## convergence code: 0
-## unable to evaluate scaled gradient
-## Model failed to converge: degenerate  Hessian with 1 negative eigenvalues</code></pre>
+## Model failed to converge with max|grad| = 0.0121527 (tol = 0.001, component 1)</code></pre>
 </div>
 </div>
 <div id="generalized-estimating-equations-gee" class="section level1">

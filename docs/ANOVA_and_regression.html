@@ -253,7 +253,7 @@ div.tocify {
 <span class="kw">library</span>(psych)</code></pre></div>
 <div id="anova" class="section level1">
 <h1>ANOVA</h1>
-<p>We are going to be using the Big Five Inventory dataset, <code>bfi</code>, to demonsrate ANOVA. This dataset it contained in the <code>psych</code> package.</p>
+<p>We are going to be using the Big Five Inventory dataset, <code>bfi</code>, to demonstrate ANOVA. This dataset it contained in the <code>psych</code> package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(bfi)</code></pre></div>
 <p>Before we get into the ANOVA, we should first create all of our scale scores.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">corr.test</span>(<span class="kw">select</span>(bfi, A1, A2, A3, A4, A5))
@@ -313,7 +313,7 @@ bfi &lt;-<span class="st"> </span>bfi %&gt;%
 <p>A better thing to do would be to check for differences with a one-way anova.</p>
 <div id="one-way-anova" class="section level2">
 <h2>One-Way ANOVA</h2>
-<p>Perform a one-way ANOVA for education level on concientousness. Let’s first look at the distributions of conscientiousness by education level. Note that first we’re changing the education variable’s type from integer to factor with the <code>as.factor()</code> function and giving nice labels to the factor levels.</p>
+<p>Perform a one-way ANOVA for education level on conscientiousness. Let’s first look at the distributions of conscientiousness by education level. Note that first we’re changing the education variable’s type from integer to factor with the <code>as.factor()</code> function and giving nice labels to the factor levels.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bfi &lt;-<span class="st"> </span>bfi %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">education =</span> <span class="kw">as.factor</span>(education),
          <span class="dt">education =</span> <span class="kw">factor</span>(education, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">'HS'</span>, 
@@ -447,7 +447,7 @@ bfi &lt;-<span class="st"> </span>bfi %&gt;%
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 87 observations deleted due to missingness</code></pre>
-<p>There is a statistically signficant main effect of gender, <em>F</em>(1, 2480) = 17.14, <em>p</em> &lt; .001, such that, women (<em>M</em> = 4.36, <em>SD</em> = 0.93) are more conscientious than men (<em>M</em> = 4.18, <em>SD</em> = 0.96). These main effects are qualified by a statistically significant two-way interaction of eduation and gender, <em>F</em>(4, 2480) = 2.56, <em>p</em> = .037. Let’s make a bar graph!</p>
+<p>There is a statistically significant main effect of gender, <em>F</em>(1, 2480) = 17.14, <em>p</em> &lt; .001, such that, women (<em>M</em> = 4.36, <em>SD</em> = 0.93) are more conscientious than men (<em>M</em> = 4.18, <em>SD</em> = 0.96). These main effects are qualified by a statistically significant two-way interaction of education and gender, <em>F</em>(4, 2480) = 2.56, <em>p</em> = .037. Let’s make a bar graph!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plotdata &lt;-<span class="st"> </span>bfi %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">group_by</span>(gender, education) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">mean =</span> <span class="kw">mean</span>(conscient, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), 
@@ -501,7 +501,7 @@ bfi &lt;-<span class="st"> </span>bfi %&gt;%
 ## sample estimates:
 ## mean of the differences 
 ##                 14.6629</code></pre>
-<p>We can test if these two patterns are statistically different from each other with a gender (<strong>between-subjects</strong>) by topic (<strong>within-subjects</strong>) two-way mixed effectcs ANOVA. Where topic has two levels: 1) Verbal and 2) quantitative. We have to restructure our data first.</p>
+<p>We can test if these two patterns are statistically different from each other with a gender (<strong>between-subjects</strong>) by topic (<strong>within-subjects</strong>) two-way mixed effects ANOVA. Where topic has two levels: 1) Verbal and 2) quantitative. We have to restructure our data first.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(sat.act)
 
 sat.act &lt;-<span class="st"> </span>sat.act %&gt;%
@@ -555,14 +555,14 @@ sat.act_long &lt;-<span class="st"> </span>sat.act %&gt;%
 </div>
 <div id="regression" class="section level1">
 <h1>Regression</h1>
-<p>Back to the <code>bfi</code> dataset. What if we wanted to treat <code>education</code> like an interval measured variable instead of ordinal? We could then regress concientiousness on education in a simple linear regression model. First, let’s clear our environment and re-load the data.</p>
+<p>Back to the <code>bfi</code> dataset. What if we wanted to treat <code>education</code> like an interval measured variable instead of ordinal? We could then regress conscientiousness on education in a simple linear regression model. First, let’s clear our environment and re-load the data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(bfi)
 
 bfi &lt;-<span class="st"> </span>bfi %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">C4.r =</span> (<span class="kw">min</span>(C4, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) +<span class="st"> </span><span class="kw">max</span>(C4, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) -<span class="st"> </span>C4,
          <span class="dt">C5.r =</span> (<span class="kw">min</span>(C5, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) +<span class="st"> </span><span class="kw">max</span>(C5, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) -<span class="st"> </span>C5,
          <span class="dt">conscient =</span> (C1 +<span class="st"> </span>C2 +<span class="st"> </span>C3 +<span class="st"> </span>C4.r +<span class="st"> </span>C5.r)/<span class="dv">5</span>)</code></pre></div>
-<p>It’s good practice to make a scatterplot before running a regression. Do this using <code>ggplot2</code>. You might want to try using <code>geom_jitter()</code>. Also, add a linear regression line using <code>geom_smooth(method = &quot;lm&quot;)</code>.</p>
+<p>It’s good practice to make a scatter plot before running a regression. Do this using <code>ggplot2</code>. You might want to try using <code>geom_jitter()</code>. Also, add a linear regression line using <code>geom_smooth(method = &quot;lm&quot;)</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#make a scatter plot here. </span></code></pre></div>
 <p>Now let’s run our model using the <code>lm()</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod4 &lt;-<span class="st"> </span><span class="kw">lm</span>(conscient ~<span class="st"> </span>education, <span class="dt">data =</span> bfi)
@@ -627,7 +627,7 @@ bfi &lt;-<span class="st"> </span>bfi %&gt;%
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#regression lines split by gender</span></code></pre></div>
 <div id="logistic-regression" class="section level2">
 <h2>Logistic Regression</h2>
-<p>Because personality is relatively stable, we may instead ask are people who are more concientious more likely to graduate from college? This would be a logistic regression model. We can use the code we wrote yesterday for creating the dichotomous variable 1 = yes college, 0 = no college.</p>
+<p>Because personality is relatively stable, we may instead ask are people who are more conscientious more likely to graduate from college? This would be a logistic regression model. We can use the code we wrote yesterday for creating the dichotomous variable 1 = yes college, 0 = no college.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bfi &lt;-<span class="st"> </span>bfi %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">coll_grad =</span> (education &gt;<span class="st"> </span><span class="dv">3</span>))</code></pre></div>
 <p>Then we can run our model by using the <code>glm()</code> function and adding <code>family = binomial</code>.</p>
@@ -665,7 +665,7 @@ bfi &lt;-<span class="st"> </span>bfi %&gt;%
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(<span class="kw">coef</span>(mod6))</code></pre></div>
 <pre><code>## (Intercept)   conscient 
 ##   0.6601588   0.9218058</code></pre>
-<p>You are 0.92 times as likely to go graduate from college for every 1 unit increase in conscienciousness, but this is only mariginally significant, <em>p</em> = .073.</p>
+<p>You are 0.92 times as likely to go graduate from college for every 1 unit increase in conscientiousness, but this is only marginally significant, <em>p</em> = .073.</p>
 </div>
 </div>
 

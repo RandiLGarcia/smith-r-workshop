@@ -36,7 +36,7 @@ library(dplyr)
 acitelli_ind <- read.csv(file.choose(), header=TRUE)
 ```
 
-Convert individual data to pairwise. If you imported a pairwise set, skip this chunk. I also create a gender variable that's a **factor** and has labels `hus` and `wife`. This vairable will be useful later. 
+Convert individual data to pairwise. If you imported a pairwise set, skip this chunk. I also create a gender variable that's a **factor** and has labels `hus` and `wife`. This variable will be useful later. 
 
 ```{r}
 tempA <- acitelli_ind %>% 

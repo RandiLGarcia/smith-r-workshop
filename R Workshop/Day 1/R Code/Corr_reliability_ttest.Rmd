@@ -30,7 +30,7 @@ library(psych)
 
 #Data inside R packages
 
-To demonstrate the use of the `alpha()` fuction in the `psych` package from computing Cronbach's alpha, we will need a data set with scale items. Many packages have example datasets pre-loaded. The `psych` package has a dataset called `bfi` that has n = 2800 participants responding to 25 personality itmes for the Big Five Inventory. 
+To demonstrate the use of the `alpha()` function in the `psych` package from computing Cronbach's alpha, we will need a data set with scale items. Many packages have example datasets pre-loaded. The `psych` package has a dataset called `bfi` that has n = 2800 participants responding to 25 personality items for the Big Five Inventory. 
 
 ```{r}
 #We can see a list of ALL the datasets current avaliable
@@ -62,7 +62,7 @@ In addition to descriptive statistics, we would probably also like to get a corr
 corr.test(select(bfi, A1, A2, A3, A4, A5))
 ```
 
-There is also a `pairs()` fucntion in Base R and the `ggpairs()` function in the `GGally` package that is a ggplot correlation matrix/matrix scatterplot provider.
+There is also a `pairs()` function in Base R and the `ggpairs()` function in the `GGally` package that is a ggplot correlation matrix/matrix scatter plot provider.
 
 ```{r}
 #install.packages("GGally")
@@ -77,13 +77,13 @@ It is clear that we will need to reverse score A1 to assess reliability and to c
 #Use a dplyr funcion to add a new variable A1.r, the reversed item. 
 ```
 
-Now compute correlation matrices for the other 4 personality subscales and create any reverse scored items the need to be created.
+Now compute correlation matrices for the other 4 personality sub scales and create any reverse scored items the need to be created.
 
 ```{r}
 #correlation matrices and reverse scored items
 ```
 
-For more practice, find another dataset that sounds interesting and run some correlation matricies.
+For more practice, find another dataset that sounds interesting and run some correlation matrices.
 
 ```{r}
 #data()
@@ -97,14 +97,14 @@ Now that we have our reverse scored items and we have a sense of how the items r
 alpha(select(bfi, A1.r, A2, A3, A4, A5))
 ```
 
-With an alphas of .70 we have a reliabile agreeableness scale. The next step would be to create agreeableness scale scores for participants, the average of these 5 items. We can do this with `mutate()`. Note that we cannot use `mean()` here because `mean()` is going to get the mean of a column (a variable). What we want it the mean across columns.   
+With an alphas of .70 we have a reliable agreeableness scale. The next step would be to create agreeableness scale scores for participants, the average of these 5 items. We can do this with `mutate()`. Note that we cannot use `mean()` here because `mean()` is going to get the mean of a column (a variable). What we want it the mean across columns.   
 
 ```{r}
 bfi <- bfi %>%
   mutate(agreeable = (A1.r + A2 + A3 + A4 + A5)/5)
 ```
 
-Let's take a look at it with a visualization. Also try facetting by gender.
+Let's take a look at it with a visualization. Also try faceting by gender.
 
 ```{r}
 #make some histograms, boxplots, and density plots of agreeableness
@@ -165,13 +165,13 @@ data(sat.act)
 glimpse(sat.act)
 ```
 
-Let's compare poeple's scores on the SAT verbal to their scores on the SAT quantitative using the `t.test()` function. This time instead of using the formula in the beginning, we add the two variables to be compared separated by a `,`. We also need to add `paired = TRUE`.
+Let's compare people's scores on the SAT verbal to their scores on the SAT quantitative using the `t.test()` function. This time instead of using the formula in the beginning, we add the two variables to be compared separated by a `,`. We also need to add `paired = TRUE`.
 
 ```{r}
 t.test(SATV, SATQ, data = sat.act, paired = TRUE)
 ```
 
-There is no staistically significant difference between SAT verbal and SAT quantitative scores, *t*(686) = 0.57, *p* = .566. But perhaps there is a difference for boys only, or for girls only. We can create a dataset of just boys using `filter()` and then another one of just girls. This would be completely fine, but we could also pipe directly into the `t.test()` function. There is a catch: The pipe, `%>%`, puts the resulting dataframe into the first position in the destination function, but we want it in the third position. We can use the `.` symbol to pipe the dataframe into whichever position we'd like. 
+There is no statistically significant difference between SAT verbal and SAT quantitative scores, *t*(686) = 0.57, *p* = .566. But perhaps there is a difference for boys only, or for girls only. We can create a dataset of just boys using `filter()` and then another one of just girls. This would be completely fine, but we could also pipe directly into the `t.test()` function. There is a catch: The pipe, `%>%`, puts the resulting dataframe into the first position in the destination function, but we want it in the third position. We can use the `.` symbol to pipe the dataframe into whichever position we'd like. 
 
 ```{r}
 sat.act %>%
@@ -194,7 +194,7 @@ Explore the differences in `SATV` and `SATQ` for each level of the `education` v
 
 #Chi-Square Test
 
-Here is a bonus chi-sqaure test to test if education is associated with gender. Question: Is degree attainment related to gender?
+Here is a bonus chi-square test to test if education is associated with gender. Question: Is degree attainment related to gender?
 
 ```{r}
 counts <- tally(gender~education, data = filter(bfi, !is.na(education)))

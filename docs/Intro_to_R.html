@@ -262,7 +262,7 @@ a_data_thing$x</code></pre></div>
 <p>Write notes for yourself in the white space. Maybe explain to your future self what dollar signs do.</p>
 <p><strong>ERASE THIS AND TYPE SOME NOTES HERE</strong></p>
 <p>Enough playing around, let’s load some data!</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">acitelli &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/randigarcia/Desktop/acitelli.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">acitelli &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/randigarcia/Desktop/Data/acitelli.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p>Next, you want to look at your data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(acitelli)</code></pre></div>
 <pre><code>##   cuplid  Yearsmar gender self_pos other_pos satisfaction tension simhob
@@ -326,7 +326,7 @@ a_data_thing$x</code></pre></div>
 </div>
 <div id="basic-descriptive-statistics-with-mosaic" class="section level1">
 <h1>Basic Descriptive Statistics with <code>mosaic</code></h1>
-<p>The function <code>favstats()</code> will give descriptive statistics for a numerical vairable, and the function <code>tally()</code> will give you frequencies for a categorical variable (or a numberical variable…if you want it). Functions in <code>mosaic</code> use the formula syntax, where <code>y ~ x</code>, or for a single variable, <code>~x</code>. The <code>~</code> key can be found just below your <code>esc</code> key. The first argument is the formula, and the second argument is the data frame, e.g., <code>data = acitelli</code>.</p>
+<p>The function <code>favstats()</code> will give descriptive statistics for a numerical variable, and the function <code>tally()</code> will give you frequencies for a categorical variable (or a numerical variable…if you want it). Functions in <code>mosaic</code> use the formula syntax, where <code>y ~ x</code>, or for a single variable, <code>~x</code>. The <code>~</code> key can be found just below your <code>esc</code> key. The first argument is the formula, and the second argument is the data frame, e.g., <code>data = acitelli</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">favstats</span>(~satisfaction, <span class="dt">data =</span> acitelli)</code></pre></div>
 <pre><code>##       min       Q1   median Q3 max    mean        sd   n missing
 ##  1.166667 3.333333 3.833333  4   4 3.60473 0.4964205 296       0</code></pre>
@@ -346,7 +346,7 @@ a_data_thing$x</code></pre></div>
 ## 2      1 1.166667 3.500000 3.833333  4   4 3.618243 0.4617875 148       0</code></pre>
 <p>What are the standard deviations of perceived <code>tension</code> by gender?</p>
 <p>What is(are) the mode(s) of the <code>self_pos</code> variable?</p>
-<p>The <code>mosaic</code> package also has a function for getting the correlation coefficent, it’s called <code>cor()</code>. Using the same format (i.e., formula then data), how would you get the correlation of satisfaction and tension?</p>
+<p>The <code>mosaic</code> package also has a function for getting the correlation coefficient, it’s called <code>cor()</code>. Using the same format (i.e., formula then data), how would you get the correlation of satisfaction and tension?</p>
 </div>
 
 

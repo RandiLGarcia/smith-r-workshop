@@ -1,14 +1,14 @@
 ---
 title: "Growth Curve Modeling"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: 3
   html_document:
     highlight: pygments
     theme: cerulean
     toc: yes
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
 fontsize: 12 pt
 ---
 ```{r setup, include=FALSE}
@@ -41,7 +41,7 @@ library(dplyr)
 library(nlme)
 library(ggplot2)
 
-kashy_ppp <- read.csv("/Users/randigarcia/Dropbox/Smith-Service/Three-day-workshop/R Workshop/Data/kashy.csv", header=TRUE)
+kashy_ppp <- read.csv(file.choose(), header=TRUE)
 ```
 
 ```{r, eval=FALSE}
@@ -144,7 +144,7 @@ Low_Avoid_Slope
 $High Avoidance (+1sd) Slope = .019 + .0045*1.002 = .0235$  
 $Low Avoidance (-1sd) Slope = .019 - .0045*1.002 = .0145$  
 
-Alternatively, we could re-center Avoidance to obtain these two values. Recall that the re-centering method will give you significance tests of the simple slopes and then you can use the `graphMod()` fucntion to make a figure.  We interpret this interaction as: men higher on avoidance become more satisfied over the course of the study than men lower on avoidance, but this difference is not significant.
+Alternatively, we could re-center Avoidance to obtain these two values. Recall that the re-centering method will give you significance tests of the simple slopes and then you can use the `graphMod()` function to make a figure.  We interpret this interaction as: men higher on avoidance become more satisfied over the course of the study than men lower on avoidance, but this difference is not significant.
 
 #Dyadic Growth Curve Modeling
 
