@@ -1,5 +1,5 @@
 ---
-title: "Confirmatory Factor Analysis"
+title: "Confirmatory Factor Analysis and SEM"
 output:
   html_document:
     highlight: pygments
@@ -29,9 +29,16 @@ library(psych)
 ```{r}
 #install.packages("lavaan")
 library(lavaan)
+
+#install.packages("semPlot")
+library(semPlot)
 ```
 
 #Confirmatory Factor Analysis
+
+Now, instead of taking a shot in the dark about the factor structue, we are going in with a clear idea about which items we things load on which factors. Our goal is to test how well our model of the factor structure actually fits the data. 
+
+First we specify the model.
 
 ```{r}
 bf_model <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
@@ -39,20 +46,41 @@ bf_model <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
               extrov =~ E1 + E2 + E3 + E4 + E5
               neurot =~ N1 + N2 + N3 + N4 + N5
               openness =~ O1 + O2 + O3 + O4 + O5 '
+```
 
+##Diagram
+
+Plot the model to make sure it is what you want. Here we are using the `semPaths()` and `semPlotModel()` from the `semPlot` package. The `rotation = 2` option forces the exogenous vairables to be on the left side. 
+
+```{r}
+semPaths(semPlotModel(bf_model), rotation = 2)
+```
+
+##Output
+
+Then fit the CFA model with `cfa()` and ask for the relevant output.
+
+```{r}
 bf_fit <- cfa(bf_model, data = bfi)
 
-
 summary(bf_fit, fit.measures = TRUE, rsq=TRUE)
-inspect(bf_fit, what = "std")
+inspect(bf_fit, what = "std") #for standardized estimates
 ```
+
+##Modification Indicies
+
+Because our model is not a great fit to our data, we migth want to ask for the *modification indicies* with the `modindices()` function. `lavaan` will give you a set of changes you can make that will increase the fit on the model. The `mi` value is the amount a reduction in the chi-square statistics that each change would bring---so the higher the better because a reduction in chi-square means and increase in fit! 
 
 ```{r}
 modindices(bf_fit) %>% 
-  arrange(desc(mi))
+  arrange(desc(mi)) %>%
+  select(lhs, op, rhs, mi) %>%
+  head(10)
 ```
 
-Add error covariances based on modificaton indicies.
+##Re-specifying the Model
+
+Maybe we want to add error covariances based on modificaton indicies. I recommend only doing this if it makes theoretical sense. Also, what ever theoretical rule you use to justify making these error correlations, if it applies to other sets of items, then add the correlations there too. Be consistent! **If you just make changes based on the modification indicies without thinking carefully about the theory behind them, then you are doing exploratory factor analysis.**   
 
 ```{r}
 bf_model_re1 <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
@@ -63,9 +91,16 @@ bf_model_re1 <- ' agreeable =~ A1 + A2 + A3 + A4 + A5
                     
                   N1 ~~ N2
                   N3 ~~ N4'
+```
 
+How would you ask for a diagram of this model?
+
+```{r}
+#diagram here.
+```
+
+```{r}
 bf_fit_re1 <- cfa(bf_model_re1, data = bfi)
-
 
 summary(bf_fit_re1, fit.measures = TRUE, rsq=TRUE)
 inspect(bf_fit_re1, what = "std")
@@ -73,10 +108,12 @@ inspect(bf_fit_re1, what = "std")
 
 ```{r}
 modindices(bf_fit_re1) %>% 
-  arrange(desc(mi))
+  arrange(desc(mi)) %>%
+  select(lhs, op, rhs, mi) %>%
+  head(10)
 ```
 
-Remove A1 -- "Am indifferent to the feelings of others," and O4 -- "Spend time reflecting on things," based on crappy loadings.
+We might also want to remove A1 -- "Am indifferent to the feelings of others," and O4 -- "Spend time reflecting on things," based on crappy loadings.
 
 ```{r}
 bf_model_re2 <- ' agreeable =~ A2 + A3 + A4 + A5
@@ -90,20 +127,74 @@ bf_model_re2 <- ' agreeable =~ A2 + A3 + A4 + A5
 
 bf_fit_re2 <- cfa(bf_model_re2, data = bfi)
 
-
 summary(bf_fit_re2, fit.measures = TRUE, rsq=TRUE)
 inspect(bf_fit_re2, what = "std")
 ```
 
+It is still not a great fit to the data, but I don't think I'd want to amke any of these modifications. 
+
 ```{r}
 modindices(bf_fit_re2) %>% 
-  arrange(desc(mi))
+  arrange(desc(mi)) %>%
+  select(lhs, op, rhs, mi) %>%
+  head(10)
 ```
+
+We can compare teh CFIs for the 3 models with the `fitmeasures()` function. 
 
 ```{r}
 fitmeasures(bf_fit)[9]
 fitmeasures(bf_fit_re1)[9]
 fitmeasures(bf_fit_re2)[9]
+```
+
+#Structural Equation Modeling
+
+In real life you should not proceed to the structural equation modeling phase unless you have a good fitting measurement model (CFA). For demonstration purposes let's add gender, age, and education into the model as predictors of the 5 personality factors. 
+
+```{r}
+bf_model_sem <- ' agreeable =~ A2 + A3 + A4 + A5
+                  conscient =~ C1 + C2 + C3 + C4 + C5
+                  extrov =~ E1 + E2 + E3 + E4 + E5
+                  neurot =~ N1 + N2 + N3 + N4 + N5
+                  openness =~ O1 + O2 + O3 + O5 
+                    
+                  N1 ~~ N2
+                  N3 ~~ N4
+
+                  agreeable ~ age + gender + education
+                  conscient ~ age + gender + education
+                  extrov ~ age + gender + education
+                  neurot ~ age + gender + education
+                  openness ~ age + gender + education
+            
+                  age ~~ gender
+                  age ~~ education
+                  gender ~~ education
+                  '
+```
+
+Let's make the graph.
+
+```{r}
+semPaths(semPlotModel(bf_model_sem), rotation = 2)
+```
+
+Instead of the `cfa()` function we will use the `sem()` function.
+
+```{r}
+bf_fit_sem <- sem(bf_model_sem, data = bfi)
+
+summary(bf_fit_sem, fit.measures = TRUE, rsq=TRUE)
+
+#standardized item loadings
+inspect(bf_fit_sem, what = "std")$lambda 
+
+#standardized path estimates
+inspect(bf_fit_sem, what = "std")$beta 
+
+#correlations bewteen latent variables and exogenous variables
+inspect(bf_fit_sem, what = "std")$psi 
 ```
 
 
