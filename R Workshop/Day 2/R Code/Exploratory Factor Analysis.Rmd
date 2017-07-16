@@ -31,36 +31,104 @@ library(GPArotation)
 
 #Exploratory Factor Analysis
 
+Let's load the Big Five Inventory dataset. 
+
 ```{r}
 data(bfi)
 ```
 
+##Correlation Heat Map
+
 ```{r}
 #correlation matrix of ALL items
 r_matrix <- corr.test(select(bfi, -gender, -education, -age))$r
+
 cor.plot(r_matrix)
 ```
 
+##Eigenvalues
+
+A method for finding the number of factors called the Kaiser method involves taking the number of eigenvalues of the correlation matrix that are greater than 1. We can do that with the `eigen()` function. 
+
 ```{r}
-fa(r_matrix, nfactors = 5)
+sum(eigen(r_matrix)$values >1)
+```
+
+Because there are 6, the Kaiser method would have us extract 6 factors.  
+
+##Factor Analysis
+
+We also want to ask for an oblique **rotation** because the factors may be correlated. Oblique rotation options: “promax”, “oblimin”, “simplimax”, “bentlerQ, and “geominQ”. The orthogonal rotation options: “none”, “varimax”, “quartimax”, “bentlerT”, and “geominT”.  
+
+We also want to ask for Principal Axis Factoring, `fm=“pa”`. The other **estimate techniques** available are `fm=“minres”`, `fm=“”wls”`, `fm=”gls”` and `fm=”ml”`. Read the documentation to find out more. 
+
+```{r}
+fa_6 <- fa(r_matrix, nfactors = 6, rotate = "oblimin", fm = "pa")
+
+fa_6
+```
+
+We can see that the 6th factor is kind of a junk factor. But, pay close attention to the items that want to load on this factor. It would be a good idea to open up the dataset's help file and read those items, `?bfi`. 
+
+###Factor Diagram
+
+We can see a diagram of this factor structure with `fa.diagram()`.
+
+```{r}
+fa.diagram(fa_6)
+```
+
+You can see that MR 6 only has the one openness to experience item, so maybe we should try 5 factors instead of 6. 
+
+##Scree Plot
+
+For more evidence, we could look at a scree plot---a plot of the eigenvalues.
+
+```{r}
+plotdata <- data.frame(x = seq(1:25), y = (eigen(r_matrix)$values))
+
+ggplot(plotdata, aes(x = x, y = y)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = 1, color = "red")
+```
+
+##Five-Factor Solution
+
+Let's try the 5 factor solution. 
+
+```{r}
+fa_5 <- fa(r_matrix, nfactors = 5, rotate = "oblimin", fm = "pa")
+
+fa_5
 ```
 
 ```{r}
-pc <- principal(Harman74.cor$cov,4,rotate="varimax")   #principal components
-pa <- fa(Harman74.cor$cov,4,fm="pa" ,rotate="varimax")  #principal axis 
-uls <- fa(Harman74.cor$cov,4,rotate="varimax")          #unweighted least squares is minres
-wls <- fa(Harman74.cor$cov,4,fm="wls")  
-
-#then compare with a maximum likelihood solution using factanal
-mle <- factanal(covmat=Harman74.cor$cov,factors=4)
-
-#finally, compare the unrotated factor, ml, uls, and  wls solutions
-wls <- fa(Harman74.cor$cov,4,rotate="none",fm="wls")
-pa <- fa(Harman74.cor$cov,4,rotate="none",fm="pa")
-minres <-  factanal(factors=4,covmat=Harman74.cor$cov,rotation="none")
-mle <- fa(Harman74.cor$cov,4,rotate="none",fm="mle")
-uls <- fa(Harman74.cor$cov,4,rotate="none",fm="uls")
-factor.congruence(list(minres,mle,pa,wls,uls))
+fa.diagram(fa_5)
 ```
+
+Lastly, you might want a factor loading plot. It is hard to interpret with so many factors, but with two factors it would look nice. 
+
+```{r}
+plot(fa_5)
+```
+
+The items seem to be factoring as we would expect. 
+
+#Principal Components Analysis 
+
+We might want to try some other estimation techniques to compare.  
+
+```{r}
+pca <- principal(r_matrix, 5, rotate = "oblimin")
+
+pca
+```
+
+```{r}
+fa.diagram(pca)
+```
+
+Things look pretty similar with PCA, this is typical, but I would recommend using Principal Axis Factoring, `fm = "pa"`. Read more about this is Preacher & Maccallum (2003). 
 
 
